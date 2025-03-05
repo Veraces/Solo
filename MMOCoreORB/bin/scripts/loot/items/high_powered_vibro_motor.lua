@@ -6,9 +6,9 @@ high_powered_vibro_motor = {
 	customObjectName = "",
 	directObjectTemplate = "object/tangible/component/weapon/vibro_unit_enhancement_max_damage.iff",
 	craftingValues = {
-		{"mindamage",300,500,1},
-		{"maxdamage",300,500,1},
-		{"useCount",11,35,0},
+		{"mindamage",400,500,1},
+		{"maxdamage",700,800,1},
+		{"useCount",25,50,0},
 	},
 	customizationStringNames = {},
 	customizationValues = {}
