@@ -241,7 +241,7 @@ core3_bootstrap() {
 
     msg "Using ${RUN_USER} in ${HOME_DIR}"
 
-    export REPO_PUBLIC_URL=${REPO_PUBLIC_URL:-'https://github.com/swgemu'}
+    export REPO_PUBLIC_URL=${REPO_PUBLIC_URL:-'https://github.com/Veraces/Solo'}
     export REPO_PUBLIC_BRANCH=${REPO_PUBLIC_BRANCH:-'unstable'}
 
     echo -e 'Dpkg::Progress-Fancy "1";\nAPT::Color "1";' > /etc/apt/apt.conf.d/99fancy
