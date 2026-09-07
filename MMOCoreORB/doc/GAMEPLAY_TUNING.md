@@ -32,6 +32,19 @@ The multiplier is applied once to the player, including riders. Mount and vehicl
 base speeds are not multiplied again. The server's rider speed checks use the
 same multiplier, and player movement is refreshed at login.
 
+## Tumbling
+
+Tumble to Standing, Tumble to Kneeling and Tumble to Prone each consume all
+remaining Health, Action and Mind, setting those three current pools to zero.
+Secondary stats, maximum HAM and wounds are not changed, and stat-based cost
+reductions do not reduce this cost. All three pools must be positive to start a
+tumble; failed state, locomotion or HAM checks do not charge anything.
+
+The command plays its tumble animation, cancels pending dizzy falls, updates all
+three bars and sends one normal incapacitation notification. This incapacitation
+counts toward the normal repeated-incapacitation death rules. Rebuild Core3 and
+restart the server to apply it.
+
 ## Stimpacks
 
 All stimpack definitions heal Health, Action and Mind damage. The same calculated
@@ -102,3 +115,9 @@ Run `python MMOCoreORB/utils/tests/stimpack_healing_test.py` with the same
 dependencies to check all 27 stimpack and repair-kit definitions and compile the
 production area-target and healing methods. It covers Mind-only patients, all
 three pools, and the existing line-of-sight, entry and dead-target restrictions.
+
+`python MMOCoreORB/utils/tests/tumble_ham_test.py` compiles all three tumble
+commands against an in-memory creature. It checks the full drain with low and
+high secondary stats, single incapacitation notification, canceled dizzy falls,
+and no HAM changes on rejected commands. It requires Python and a C++17 compiler;
+use `--compiler cl` from a Visual Studio developer prompt on Windows.

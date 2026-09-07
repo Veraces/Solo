@@ -54,3 +54,4 @@ compile_commands.json
 !utils/tests/credit_economy_test.lua
 !utils/tests/gameplay_tuning_test.py
 !utils/tests/stimpack_healing_test.py
+!utils/tests/tumble_ham_test.py

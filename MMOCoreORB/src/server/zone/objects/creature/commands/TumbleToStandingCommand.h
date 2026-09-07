@@ -21,12 +21,11 @@ public:
 		if (!checkInvalidLocomotions(creature))
 			return INVALIDLOCOMOTION;
 
-		//Check for and deduct HAM cost.
-		int actionCost = creature->calculateCostAdjustment(CreatureAttribute::QUICKNESS, 100);
-		if (creature->getHAM(CreatureAttribute::ACTION) <= actionCost)
+		// A successful tumble consumes all remaining primary HAM pools.
+		if (creature->getHAM(CreatureAttribute::HEALTH) <= 0
+				|| creature->getHAM(CreatureAttribute::ACTION) <= 0
+				|| creature->getHAM(CreatureAttribute::MIND) <= 0)
 			return INSUFFICIENTHAM;
-
-		creature->inflictDamage(creature, CreatureAttribute::ACTION, actionCost, true);
 
 		creature->setPosture(CreaturePosture::UPRIGHT, false, true);
 
@@ -52,6 +51,14 @@ public:
 
 			creature->sendStateCombatSpam("cbt_spam", "tum_standing", 0);
 		}
+
+		// Finish the tumble before incapacitating. Damage calls would stop
+		// after the first empty pool, so update all three and notify once.
+		creature->clearDizzyEvent();
+		creature->setHAM(CreatureAttribute::HEALTH, 0, true);
+		creature->setHAM(CreatureAttribute::ACTION, 0, true);
+		creature->setHAM(CreatureAttribute::MIND, 0, true);
+		creature->notifyObjectDestructionObservers(creature, 0, false);
 
 		return SUCCESS;
 	}
