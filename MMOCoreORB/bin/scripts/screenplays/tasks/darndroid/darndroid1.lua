@@ -143,8 +143,8 @@ function DarnDroid1:completeQuest(pPlayer)
 			removeQuestStatus(playerID .. ":darnDroid1WaypointID")
 		end
 
-		CreatureObject(pPlayer):addBankCredits(3000, true)
-		CreatureObject(pPlayer):sendSystemMessage("Valance Serth transfers a reward of 3000 Credits")
+		CreatureObject(pPlayer):addBankCredits(math.ceil(3000 / 100), true)
+		CreatureObject(pPlayer):sendSystemMessage("Valance Serth transfers a reward of 30 Credits")
 		PlayerObject(pGhost):increaseFactionStanding("townsperson", 50)
 		CreatureObject(pPlayer):awardExperience("combat_general", 1000, true)
 		PlayerObject(pGhost):completeJournalQuestTask(self.questCrc, self.TASK_TALKTOVALANCE, true);
@@ -265,11 +265,11 @@ function DarnDroid1:giveShipTask(pPlayer, taskType)
 	end
 
 	if (taskType == "bribe") then
-		if (CreatureObject(pPlayer):getCashCredits() < 1000) then
+		if (CreatureObject(pPlayer):getCashCredits() < math.ceil(1000 / 100)) then
 			return
 		end
 
-		CreatureObject(pPlayer):subtractCashCredits(1000)
+		CreatureObject(pPlayer):subtractCashCredits(math.ceil(1000 / 100))
 		PlayerObject(pGhost):completeJournalQuestTask(self.questCrc, self.TASK_BRIBEDAMARENT, false)
 	elseif (taskType == "threaten") then
 		PlayerObject(pGhost):decreaseFactionStanding("imperial", 50)

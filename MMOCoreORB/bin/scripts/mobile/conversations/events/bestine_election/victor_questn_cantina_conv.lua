@@ -7,7 +7,7 @@ victorQuestnCantinaConvoTemplate = ConvoTemplate:new {
 
 init_on_rival_quest = ConvoScreen:new {
 	id = "init_on_rival_quest",
-	leftDialog = "@conversation/victor_questn_cantina:s_dcb68f7c", -- Yeh, I 'ave what y'need. Y'lookin' fer some sort o'evidence against that Victor Vis'ilis? Wh'evah his name is. He'a been ignorin' our 'illegal' activites fer some time now. He even made'a agreement wit' us, wrote it on'a paper even! Daft, I says. I'll give it to ya iffin' ye pay me... two hunnerd credits.
+	customDialogText = "Looking for evidence against Victor? He wrote an agreement to ignore our illegal activities. I will give you the paper for 2 credits.",
 	stopConversation = "false",
 	options = {
 		--{"@conversation/victor_questn_cantina:s_51ac4991", "great_man"}, -- Hmm. Here you go.

@@ -184,7 +184,7 @@ function TreasureMapMenuComponent:openChestEvent(pChest, pCreature)
 	local hasOpenedChest = readData(playerID .. ":hasOpenedChest")
 
 	if (hasOpenedChest ~= 1) then
-		local credits = getRandomNumber(500, 5000)
+		local credits = math.ceil(getRandomNumber(500, 5000) / 100)
 		CreatureObject(pCreature):addCashCredits(credits, true)
 		CreatureObject(pCreature):sendSystemMessage("You find " .. credits .. " credits in the chest.")
 		writeData(playerID .. ":hasOpenedChest", 1)

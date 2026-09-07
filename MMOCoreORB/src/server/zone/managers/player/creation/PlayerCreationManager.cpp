@@ -3,6 +3,7 @@
 		See file COPYING for copying conditions.
 */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/db/ServerDatabase.h"
 #include "PlayerCreationManager.h"
 #include "server/zone/managers/player/PlayerManager.h"
@@ -42,8 +43,9 @@ PlayerCreationManager::PlayerCreationManager() :
 	professionDefaultsInfo.setNoDuplicateInsertPlan();
 	hairStyleInfo.setNoDuplicateInsertPlan();
 
-	startingCash = 100;
-	startingBank = 1000;
+	startingCash = CreditScale::credits(100);
+	startingBank = CreditScale::credits(1000);
+	startingAttributeBase = 0;
 
 	freeGodMode = false;
 
@@ -271,9 +273,10 @@ void PlayerCreationManager::loadLuaConfig() {
 
 	lua->runFile("scripts/managers/player_creation_manager.lua");
 
-	startingCash = lua->getGlobalInt("startingCash");
-	startingBank = lua->getGlobalInt("startingBank");
+	startingCash = CreditScale::credits(lua->getGlobalInt("startingCash"));
+	startingBank = CreditScale::credits(lua->getGlobalInt("startingBank"));
 	skillPoints = lua->getGlobalInt("skillPoints");
+	startingAttributeBase = lua->getGlobalInt("startingAttributeBase");
 	freeGodMode = lua->getGlobalByte("freeGodMode");
 
 	loadLuaStartingItems(lua);
@@ -723,7 +726,7 @@ void PlayerCreationManager::addProfessionStartingItems(CreatureObject* creature,
 
 	//Set the hams.
 	for (int i = 0; i < 9; ++i) {
-		int mod = professionData->getAttributeMod(i);
+		int mod = startingAttributeBase + professionData->getAttributeMod(i);
 		creature->setBaseHAM(i, mod, false);
 		creature->setHAM(i, mod, false);
 		creature->setMaxHAM(i, mod, false);

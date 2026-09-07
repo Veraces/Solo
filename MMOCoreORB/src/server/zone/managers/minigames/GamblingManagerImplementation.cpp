@@ -5,6 +5,7 @@
  *      Author: swgemu
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/managers/minigames/GamblingManager.h"
 #include "server/zone/objects/creature/CreatureObject.h"
 #include "server/zone/objects/player/PlayerObject.h"
@@ -94,8 +95,8 @@ uint32 GamblingManagerImplementation::createSlotWindow(CreatureObject* player, u
 	box->setPromptTitle("@gambling/game_n:slot_standard");
 	box->setPromptText(prompt);
 
-	box->addMenuItem("Current Bet: " + String::valueOf(amount), 0);
-	box->addMenuItem("Max Bet: " + String::valueOf(terminal->getMaxBet()), 1);
+	box->addMenuItem("Current Bet: " + String::valueOf(CreditScale::credits(amount)), 0);
+	box->addMenuItem("Max Bet: " + String::valueOf(CreditScale::credits(terminal->getMaxBet())), 1);
 	box->addMenuItem("Cash Balance: " + String::valueOf(player->getCashCredits()), 2);
 	box->addMenuItem("Bank Balance: " + String::valueOf(player->getBankCredits()), 3);
 	box->addMenuItem("Total Money: " + String::valueOf(player->getCashCredits() + player->getBankCredits()), 4);
@@ -145,7 +146,7 @@ uint32 GamblingManagerImplementation::createRouletteWindow(CreatureObject* playe
 				totalBet += terminal->getBets()->get(i)->getAmount();
 				String target = terminal->getBets()->get(i)->getTarget();
 				target[0] = toupper(target[0]);
-				box->addMenuItem(target + ": " + String::valueOf(terminal->getBets()->get(i)->getAmount()), i);
+				box->addMenuItem(target + ": " + String::valueOf(CreditScale::credits(terminal->getBets()->get(i)->getAmount())), i);
 			}
 		}
 	}
@@ -154,7 +155,7 @@ uint32 GamblingManagerImplementation::createRouletteWindow(CreatureObject* playe
 		box->addMenuItem("Total Bet : 0", 0);
 	} else {
 		box->addMenuItem(" ", -2);
-		box->addMenuItem("Total Bet : " + String::valueOf(totalBet), -3);
+		box->addMenuItem("Total Bet : " + String::valueOf(CreditScale::credits(totalBet)), -3);
 	}
 
 	box->setCancelButton(true, "@ui:leave_game");
@@ -200,15 +201,15 @@ uint32 GamblingManagerImplementation::createPayoutWindow(CreatureObject* player)
 	ManagedReference<SuiListBox*> box = new SuiListBox(player, SuiWindowType::GAMBLING_SLOT_PAYOUT, 1);
 	box->setPromptTitle("PAYOUT SCHEDULE");
 	box->setPromptText(prompt);
-	box->addMenuItem("*1|2|3 -> base:2 max:6", 0);
-	box->addMenuItem("000 -> base:4 max:12", 1);
-	box->addMenuItem("111 -> base:50 max:150", 2);
-	box->addMenuItem("222 -> base:75 max:225", 3);
-	box->addMenuItem("333 -> base:100 max:300", 3);
-	box->addMenuItem("444 -> base:250 max:750", 3);
-	box->addMenuItem("555 -> base:500 max:1500", 3);
-	box->addMenuItem("666 -> base:1000 max:3000", 3);
-	box->addMenuItem("777 -> base:1500 max:5000", 3);
+	box->addMenuItem("*1|2|3 -> base:1 max:1", 0);
+	box->addMenuItem("000 -> base:1 max:1", 1);
+	box->addMenuItem("111 -> base:1 max:2", 2);
+	box->addMenuItem("222 -> base:1 max:3", 3);
+	box->addMenuItem("333 -> base:1 max:3", 3);
+	box->addMenuItem("444 -> base:3 max:8", 3);
+	box->addMenuItem("555 -> base:5 max:15", 3);
+	box->addMenuItem("666 -> base:10 max:30", 3);
+	box->addMenuItem("777 -> base:15 max:50", 3);
 	box->setCancelButton(false, "");
 	box->setOtherButton(false, "");
 	box->setOkButton(true, "@ui:ok");
@@ -374,7 +375,14 @@ void GamblingManagerImplementation::bet(CreatureObject* player, int amount, int 
 #endif
 
 	if (machineType == GamblingTerminal::ROULETTEMACHINE) {
-		bet(rouletteGames.get(player), player, amount, target);
+		auto terminal = rouletteGames.get(player);
+		if (terminal == nullptr)
+			return;
+		if (amount <= 0 || amount > terminal->getMaxBet() / CreditScale::DIVISOR) {
+			player->sendSystemMessage("Enter a wager between 1 and " + String::valueOf(terminal->getMaxBet() / CreditScale::DIVISOR) + " credits.");
+			return;
+		}
+		bet(terminal, player, amount * CreditScale::DIVISOR, target);
 	} else if (machineType == GamblingTerminal::SLOTMACHINE) {
 		bet(slotGames.get(player), player, amount, target);
 	}
@@ -394,18 +402,20 @@ void GamblingManagerImplementation::bet(GamblingTerminal* terminal, CreatureObje
 
 	switch (machineType) {
 		case GamblingTerminal::SLOTMACHINE: {
+			int previousBet = terminal->getBets()->isEmpty() ? 0 : terminal->getBets()->get(0)->getAmount();
+			int betCost = CreditScale::credits(previousBet + amount) - CreditScale::credits(previousBet);
 			if (amount > terminal->getMaxBet()) {
 				StringIdChatParameter body("gambling/default_interface", "bet_above_max");
-				body.setDI(terminal->getMaxBet());
+				body.setDI(CreditScale::credits(terminal->getMaxBet()));
 
 				player->sendSystemMessage(body);
-			} else if (player->getCashCredits() < amount) {
+			} else if (player->getCashCredits() < betCost) {
 				player->sendSystemMessage("@gambling/default_interface:player_broke");
 			} else if (!player->isInRange(terminal, 25.0)) {
 				player->sendSystemMessage("@gambling/default_interface:bet_failed_distance");
 			} else if (amount < terminal->getMinBet()) {
 				StringIdChatParameter body("gambling/default_interface", "bet_below_min");
-				body.setDI(terminal->getMinBet());
+				body.setDI(CreditScale::credits(terminal->getMinBet()));
 
 				player->sendSystemMessage(body);
 			} else {
@@ -416,12 +426,12 @@ void GamblingManagerImplementation::bet(GamblingTerminal* terminal, CreatureObje
 				}
 
 				{
-					TransactionLog trx(player, TrxCode::GAMBLINGSLOTSTANDARD, amount, true);
-					player->subtractCashCredits(amount);
+					TransactionLog trx(player, TrxCode::GAMBLINGSLOTSTANDARD, betCost, true);
+					player->subtractCashCredits(betCost);
 				}
 
 				StringIdChatParameter textPlayer("base_player", "prose_pay_success");
-				textPlayer.setDI(amount);
+				textPlayer.setDI(betCost);
 
 				String terminalName;
 				terminal->getObjectName()->getFullPath(terminalName);
@@ -456,10 +466,10 @@ void GamblingManagerImplementation::bet(GamblingTerminal* terminal, CreatureObje
 		case GamblingTerminal::ROULETTEMACHINE: {
 			if (amount > getMaximumAllowedBet(terminal, player, target)) {
 				StringIdChatParameter body("gambling/default_interface", "bet_above_max");
-				body.setDI(terminal->getMaxBet());
+				body.setDI(CreditScale::credits(terminal->getMaxBet()));
 
 				player->sendSystemMessage(body);
-			} else if (player->getCashCredits() < amount) {
+			} else if (player->getCashCredits() < CreditScale::credits(amount)) {
 				player->sendSystemMessage("@gambling/default_interface:player_broke");
 
 			} else if (!player->isInRange(terminal, 25.0)) {
@@ -467,21 +477,21 @@ void GamblingManagerImplementation::bet(GamblingTerminal* terminal, CreatureObje
 
 			} else if (amount < terminal->getMinBet()) {
 				StringIdChatParameter body("gambling/default_interface", "bet_below_min");
-				body.setDI(terminal->getMinBet());
+				body.setDI(CreditScale::credits(terminal->getMinBet()));
 
 				player->sendSystemMessage(body);
 			} else {
 				Locker _locker(terminal);
 
 				{
-					TransactionLog trx(player, TrxCode::GAMBLINGROULETTE, amount, true);
-					player->subtractCashCredits(amount);
+					TransactionLog trx(player, TrxCode::GAMBLINGROULETTE, CreditScale::credits(amount), true);
+					player->subtractCashCredits(CreditScale::credits(amount));
 				}
 
 				terminal->getBets()->add(new GamblingBet(player, amount, roulette.get(target)));
 
 				StringIdChatParameter textPlayer("gambling/default_interface", "prose_bet_placed");
-				textPlayer.setDI(amount);
+				textPlayer.setDI(CreditScale::credits(amount));
 				player->sendSystemMessage(textPlayer);
 
 				refreshRouletteMenu(player);
@@ -707,6 +717,8 @@ void GamblingManagerImplementation::calculateOutcome(GamblingTerminal* terminal)
 						win += 500; // 500 extra credits for betting 3 credits and getting 777.
 					}
 
+					win = CreditScale::credits(win);
+
 					StringIdChatParameter textPlayer("gambling/default_interface", "winner_to_winner");
 					textPlayer.setDI(win);
 					player->sendSystemMessage(textPlayer);
@@ -720,6 +732,8 @@ void GamblingManagerImplementation::calculateOutcome(GamblingTerminal* terminal)
 					Locker _locker(player);
 
 					int win = bet->getAmount() * 2;
+
+					win = CreditScale::credits(win);
 
 					StringIdChatParameter textPlayer("gambling/default_interface", "winner_to_winner");
 					textPlayer.setDI(win);
@@ -851,20 +865,22 @@ void GamblingManagerImplementation::calculateOutcome(GamblingTerminal* terminal)
 					if (player != nullptr) {
 						Locker _locker(player);
 
+						int payout = CreditScale::credits(winnings->get(i));
+
 						// Send message to others
 						StringIdChatParameter textOther("gambling/default_interface", "winner_to_other");
-						textOther.setDI(winnings->get(i));
+						textOther.setDI(payout);
 						textOther.setTO(player->getFirstName());
 						textOther.setTO(player->getObjectID());
 						terminal->notifyOthers(player, &textOther);
 
 						StringIdChatParameter textPlayer("gambling/default_interface", "winner_to_winner");
-						textPlayer.setDI(winnings->get(i));
+						textPlayer.setDI(payout);
 						player->sendSystemMessage(textPlayer);
 
 						{
-							TransactionLog trx(TrxCode::GAMBLINGROULETTE, player, winnings->get(i), true);
-							player->addCashCredits(winnings->get(i), true);
+							TransactionLog trx(TrxCode::GAMBLINGROULETTE, player, payout, true);
+							player->addCashCredits(payout, true);
 						}
 					}
 				}

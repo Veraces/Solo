@@ -5,9 +5,11 @@
 #ifndef PURCHASETICKETCOMMAND_H_
 #define PURCHASETICKETCOMMAND_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/scene/SceneObject.h"
 #include "server/zone/objects/player/sui/messagebox/SuiMessageBox.h"
 #include "server/zone/managers/planet/PlanetManager.h"
+#include "server/zone/objects/tangible/terminal/travel/TravelTerminal.h"
 #include "server/zone/objects/region/CityRegion.h"
 #include "server/zone/objects/transaction/TransactionLog.h"
 #include "server/zone/objects/player/sui/callbacks/TravelCouponUseSuiCallback.h"
@@ -95,6 +97,12 @@ public:
 		arrivalPlanet = arrivalPlanet.replaceAll("_", " ");
 		arrivalPoint = arrivalPoint.replaceAll("_", " ");
 
+		// Bind the request to the terminal being used, including SUI purchases.
+		auto terminal = cast<TravelTerminal*>(travelTerminal);
+		auto actualDeparture = terminal != nullptr ? terminal->getPlanetTravelPoint() : nullptr;
+		if (actualDeparture == nullptr || !actualDeparture->isPoint(departurePlanet, departurePoint))
+			return INVALIDPARAMETERS;
+
 		auto zoneServer = server->getZoneServer();
 
 		if (zoneServer == nullptr) {
@@ -167,7 +175,8 @@ public:
 			return GENERALERROR;
 		}
 
-		int fare = baseFare + departureTax;
+		int tripCount = roundTrip ? 2 : 1;
+		int fare = CreditScale::credits(baseFare * tripCount) + departureTax * tripCount;
 
 		if (!roundTrip) {
 			// New Player Travel Coupon
@@ -212,9 +221,6 @@ public:
 				return GENERALERROR;
 			}
 		}
-
-		if (roundTrip)
-			fare *= 2;
 
 		//Check if they have funds.
 		int bank = creature->getBankCredits();
@@ -264,7 +270,7 @@ public:
 
 
 		StringIdChatParameter params("@base_player:prose_pay_acct_success"); //You successfully make a payment of %DI credits to %TO.
-		params.setDI(baseFare + (roundTrip * baseFare));
+		params.setDI(CreditScale::credits(baseFare * tripCount));
 		params.setTO("@money/acct_n:travelsystem"); //the Galactic Travel Commission
 
 		creature->sendSystemMessage(params);

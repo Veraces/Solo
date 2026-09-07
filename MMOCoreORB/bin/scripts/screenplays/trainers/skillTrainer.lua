@@ -79,6 +79,7 @@ function SkillTrainer:sendSkillInfoSui(pPlayer, pNpc, skillName)
 	if (persuasion > 0) then
 		moneyRequired = moneyRequired - ((moneyRequired * persuasion) / 100)
 	end
+	moneyRequired = math.ceil(moneyRequired / 100)
 
 	local skillReqTable = skillObject:getSkillsRequired()
 	local xpCost = skillObject:getXpCost()

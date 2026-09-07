@@ -430,6 +430,19 @@ class PlanetManager extends ManagedService implements Logger {
 		return planetTravelPointList.get(pointName);
 	}
 
+	@local
+	public int getPlanetTravelPointCount() {
+		return planetTravelPointList.size();
+	}
+
+	@local
+	public PlanetTravelPoint getPlanetTravelPointByIndex(int index) {
+		if (index < 0 || index >= planetTravelPointList.size())
+			return null;
+
+		return planetTravelPointList.get(index);
+	}
+
 	/**
 	 * Checks to see the travel between the points is allowed based on their settings.
 	 * @param destinationPoint The point from which is being traveled.

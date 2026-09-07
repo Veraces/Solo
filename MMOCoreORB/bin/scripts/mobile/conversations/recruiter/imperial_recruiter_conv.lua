@@ -388,7 +388,7 @@ confirm_bribe = ConvoScreen:new {
 	leftDialog = "@conversation/faction_recruiter_imperial:s_400", -- What kind of trade are you talking about? I may be amenable to gifts of friendship.
 	stopConversation = "false",
 	options = {
-		{"@conversation/faction_recruiter_imperial:s_402", "accepted_bribe_20k"} -- How about a 20000 credit gift of friendship?
+		{"How about a gift of 200 credits?", "accepted_bribe_20k"} -- How about a 20000 credit gift of friendship?
 	}
 }
 

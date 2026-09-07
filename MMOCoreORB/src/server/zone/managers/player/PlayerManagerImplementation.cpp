@@ -6,6 +6,7 @@
  */
 
 #include "server/zone/managers/player/PlayerManager.h"
+#include "server/zone/objects/creature/MovementScale.h"
 #include <utility>
 #include <mutex>
 
@@ -3828,12 +3829,12 @@ int PlayerManagerImplementation::checkSpeedHackFirstTest(CreatureObject* player,
 	if (parent != nullptr && parent->isVehicleObject()) {
 		VehicleObject* vehicle = cast<VehicleObject*>( parent.get());
 
-		allowedSpeedMod = vehicle->getSpeedMultiplierMod();
+		allowedSpeedMod = vehicle->getSpeedMultiplierMod() * MovementScale::PLAYER_MULTIPLIER;
 		allowedSpeedBase = vehicle->getRunSpeed();
 	} else if (parent != nullptr && parent->isMount()) {
 		Creature* mount = cast<Creature*>( parent.get());
 
-		allowedSpeedMod = mount->getSpeedMultiplierMod();
+		allowedSpeedMod = mount->getSpeedMultiplierMod() * MovementScale::PLAYER_MULTIPLIER;
 
 		PetManager* petManager = server->getPetManager();
 

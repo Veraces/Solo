@@ -359,7 +359,7 @@ function BartendersScreenPlay:purchaseDrinkCallback(pPlayer, pSui, eventIndex, a
 	local argNum = tonumber(args) + 1
 
 	local drinkName = drinksTable[argNum][1]
-	local drinkCost = drinksTable[argNum][2]
+	local drinkCost = math.ceil(drinksTable[argNum][2] / 100)
 	local messageString = "@food_name:" .. drinkName
 
 	local pInventory = CreatureObject(pPlayer):getSlottedObject("inventory")

@@ -68,8 +68,8 @@ function amarent_loren_convo_handler:runScreenHandlers(pConvTemplate, pPlayer, p
 
 		clonedConversation:addOption("@conversation/c_ddroid_amarent:s_301","need_info") --I need information about a ship that may be lost.
 	elseif (screenID == "need_info") then
-		if (CreatureObject(pPlayer):getCashCredits() >= 1000) then
-			clonedConversation:addOption("@conversation/c_ddroid_amarent:s_305","bribe_credits") --Would these 1000 credits show that I'm a member of the Imperial Transit Authority?
+		if (CreatureObject(pPlayer):getCashCredits() >= math.ceil(1000 / 100)) then
+			clonedConversation:addOption("Would these 10 credits show that I am a member of the Imperial Transit Authority?","bribe_credits") --Would these 1000 credits show that I'm a member of the Imperial Transit Authority?
 		end
 		clonedConversation:addOption("@conversation/c_ddroid_amarent:s_309","life_worth") --Is your life really worth a silly rule like that?
 	end

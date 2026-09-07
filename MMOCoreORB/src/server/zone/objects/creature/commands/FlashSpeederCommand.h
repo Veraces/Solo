@@ -48,7 +48,7 @@ public:
 		ManagedReference<SuiMessageBox*> suiBox = new SuiMessageBox(player, SuiWindowType::CONFIRM_FLASH_SPEEDER_PURCHASE);
 		suiBox->setCallback(new ReplaceFlashSpeederSuiCallback(server->getZoneServer()));
 		suiBox->setPromptTitle("Confirm Flash Speeder Replacement");
-		suiBox->setPromptText( "@veteran:flash_speeder_replace_prompt" );  // "A replacement Flash Speeder is available at the cost of 20000 credits. Are you sure you want a new speeder?"
+		suiBox->setPromptText("Replace your Flash Speeder for " + String::valueOf(ReplaceFlashSpeederSuiCallback::FLASH_SPEEDER_COST) + " credits?");
 		suiBox->setCancelButton(true, "@no");
 		suiBox->setOkButton(true, "@yes");
 

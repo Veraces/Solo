@@ -5,6 +5,7 @@
  *      Author: Kyle
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/managers/loot/LootManager.h"
 #include "server/zone/objects/scene/SceneObject.h"
 #include "server/zone/objects/creature/ai/AiAgent.h"
@@ -302,7 +303,7 @@ int LootManagerImplementation::calculateLootCredits(int level) {
 
 	int credits = mincredits + System::random(maxcredits - mincredits);
 
-	return credits;
+	return CreditScale::credits(credits);
 }
 
 void LootManagerImplementation::setRandomLootValues(TransactionLog& trx, TangibleObject* prototype, const LootItemTemplate* itemTemplate, int level, float excMod) {

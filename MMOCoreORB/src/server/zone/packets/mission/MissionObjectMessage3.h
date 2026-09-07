@@ -5,6 +5,7 @@
 #ifndef MISSIONOBJECTMESSAGE3_H_
 #define MISSIONOBJECTMESSAGE3_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/packets/BaseLineMessage.h"
 #include "server/zone/objects/mission/MissionObject.h"
 #include "server/zone/objects/waypoint/WaypointObject.h"
@@ -49,7 +50,7 @@ public:
 		insertUnicode(mi->getCreatorName());
 
 		//Reward (cr)
-		insertInt(mi->getRewardCredits());
+		insertInt(CreditScale::credits(mi->getRewardCredits()));
 
 		//Dest Location
 		insertFloat(mi->getStartPositionX()); //x

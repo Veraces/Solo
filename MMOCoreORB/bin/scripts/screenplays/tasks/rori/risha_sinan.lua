@@ -263,8 +263,9 @@ function RishaSinan:onLoot(pLooter, taskID)
 
 	if (deadMites >= lootTasks[taskID].requiredSamples) then
 		PlayerObject(pGhost):completeJournalQuestTask(questCrc, taskID, true)
-		CreatureObject(pLooter):addBankCredits(lootTasks[taskID].reward, true)
-		CreatureObject(pLooter):sendSystemMessage("Risha Sinan transfers a reward of " .. lootTasks[taskID].reward .. " Credits")
+		local credits = math.ceil(lootTasks[taskID].reward / 100)
+		CreatureObject(pLooter):addBankCredits(credits, true)
+		CreatureObject(pLooter):sendSystemMessage("Risha Sinan transfers a reward of " .. credits .. " Credits")
 	end
 
 	if (self:isQuestComplete(pLooter)) then

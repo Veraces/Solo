@@ -49,3 +49,7 @@ build.out
 build.out.prev
 bin/screenlog*
 compile_commands.json
+!utils/tests/
+!utils/tests/credit_scale_test.cpp
+!utils/tests/credit_economy_test.lua
+!utils/tests/gameplay_tuning_test.py

@@ -39,7 +39,7 @@ function craftingContractorConvoHandler:runScreenHandlers(pConvTemplate, pPlayer
 		CreatureObject(pPlayer):awardExperience(xpType, xpTotal, true)
 
 		local crateDiff = crateObject:getCrateDifficulty();
-		local payAmount = ((15 + ((crateDiff - 1) * 10)) * 0.20) * itemTotal
+		local payAmount = math.ceil((((15 + ((crateDiff - 1) * 10)) * 0.20) * itemTotal) / 100)
 
 		CreatureObject(pPlayer):addCashCredits(payAmount, true)
 		CreatureObject(pPlayer):sendSystemMessageWithDI("@quest/crafting_contract/system_messages:pay_msg", payAmount)

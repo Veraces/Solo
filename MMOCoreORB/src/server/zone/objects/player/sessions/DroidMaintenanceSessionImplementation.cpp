@@ -5,6 +5,7 @@
  *      Author: Klivian
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/player/sessions/DroidMaintenanceSession.h"
 #include "server/zone/Zone.h"
 #include "server/zone/objects/creature/CreatureObject.h"
@@ -148,7 +149,7 @@ void DroidMaintenanceSessionImplementation::sendMaintenanceTransferBox(){
 			cancelSession();
 			return;
 		}
-		int fee = planetManager->getTravelFare(zoneStructure->getZoneName(),zoneCreature->getZoneName());
+		int fee = CreditScale::credits(planetManager->getTravelFare(zoneStructure->getZoneName(),zoneCreature->getZoneName()));
 		selectedFees = fee;
 		promptText << "\n@pet/droid_modules:droid_maint_diff_planet_prefix " << fee << " @pet/droid_modules:droid_maint_diff_planet_suffix \n";
 	}

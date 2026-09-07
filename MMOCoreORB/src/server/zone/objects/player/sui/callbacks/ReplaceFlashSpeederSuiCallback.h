@@ -8,6 +8,7 @@
 #ifndef REPLACEFLASHSPEEDERSUICALLBACK_H_
 #define REPLACEFLASHSPEEDERSUICALLBACK_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/player/sui/SuiCallback.h"
 #include "server/zone/objects/transaction/TransactionLog.h"
 
@@ -16,7 +17,7 @@ class ReplaceFlashSpeederSuiCallback : public SuiCallback {
 public:
 
 	enum {
-		FLASH_SPEEDER_COST = 20000
+		FLASH_SPEEDER_COST = CreditScale::credits(20000)
 	};
 
 	ReplaceFlashSpeederSuiCallback(ZoneServer* server)

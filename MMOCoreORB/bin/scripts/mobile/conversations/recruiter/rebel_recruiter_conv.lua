@@ -388,7 +388,7 @@ confirm_bribe = ConvoScreen:new {
 	leftDialog = "@conversation/faction_recruiter_rebel:s_570", -- I would be happy to accept a donation.
 	stopConversation = "false",
 	options = {
-		{"@conversation/faction_recruiter_rebel:s_572", "accepted_bribe_20k"} -- I just happen to have a spare 20000 credits for you.
+		{"How about a gift of 200 credits?", "accepted_bribe_20k"} -- I just happen to have a spare 20000 credits for you.
 	}
 }
 

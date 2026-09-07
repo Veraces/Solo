@@ -8,6 +8,7 @@
 #ifndef CLONINGSTORESUICALLBACK_H_
 #define CLONINGSTORESUICALLBACK_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/player/sui/SuiCallback.h"
 #include "server/zone/objects/player/PlayerObject.h"
 #include "server/zone/objects/building/BuildingObject.h"
@@ -78,7 +79,7 @@ public:
 			int bank = player->getBankCredits();
 			int cash = player->getCashCredits();
 
-			int cost = 1000;
+			int cost = CreditScale::credits(1000);
 
 			if (bank < cost) {
 				int diff = cost - bank;

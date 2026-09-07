@@ -8,6 +8,7 @@
 #ifndef REPAIRVEHICLESUICALLBACK_H_
 #define REPAIRVEHICLESUICALLBACK_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/player/sui/SuiCallback.h"
 #include "server/zone/objects/creature/VehicleObject.h"
 #include "server/zone/objects/transaction/TransactionLog.h"
@@ -44,6 +45,7 @@ public:
 			return;
 
 		int repairCost = vehicle->calculateRepairCost(player);
+		int baseCost = CreditScale::credits(repairCost);
 		int totalFunds = player->getBankCredits();
 		int tax = 0;
 
@@ -52,6 +54,8 @@ public:
 			tax = repairCost * city->getGarageTax() / 100;
 			repairCost += tax;
 		}
+		repairCost = CreditScale::credits(repairCost);
+		tax = repairCost - baseCost;
 
 		if (repairCost > totalFunds) {
 			player->sendSystemMessage("@pet/pet_menu:lacking_funds_prefix " + String::valueOf(repairCost - totalFunds) + " @pet/pet_menu:lacking_funds_suffix"); //You lack the additional  credits required to repair your vehicle.

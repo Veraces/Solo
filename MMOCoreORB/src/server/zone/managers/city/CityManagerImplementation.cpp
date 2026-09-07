@@ -5,6 +5,7 @@
  *      Author: crush
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/managers/city/CityManager.h"
 #include "server/chat/ChatManager.h"
 #include "server/zone/Zone.h"
@@ -855,7 +856,7 @@ void CityManagerImplementation::deductCityMaintenance(CityRegion* city) {
 	if (structureTemplate == nullptr)
 		return;
 
-	int thisCost = maintenanceDiscount * structureTemplate->getCityMaintenanceAtRank(city->getCityRank() - 1);
+	int thisCost = CreditScale::credits(maintenanceDiscount * structureTemplate->getCityMaintenanceAtRank(city->getCityRank() - 1));
 	totalPaid +=  collectCivicStructureMaintenance(ch, city, thisCost);
 
 	for(int i = 0; i < city->getStructuresCount(); i++) {
@@ -863,7 +864,7 @@ void CityManagerImplementation::deductCityMaintenance(CityRegion* city) {
 
 		if(str != nullptr && str != ch) {
 			structureTemplate = cast<SharedStructureObjectTemplate*> (str->getObjectTemplate());
-			thisCost = maintenanceDiscount * structureTemplate->getCityMaintenanceAtRank(city->getCityRank() - 1);
+			thisCost = CreditScale::credits(maintenanceDiscount * structureTemplate->getCityMaintenanceAtRank(city->getCityRank() - 1));
 			totalPaid += collectCivicStructureMaintenance(str, city, thisCost);
 		}
 	}
@@ -879,27 +880,27 @@ void CityManagerImplementation::deductCityMaintenance(CityRegion* city) {
 
 			if(structure != nullptr) {
 				structureTemplate = cast<SharedStructureObjectTemplate*>(structure->getObjectTemplate());
-				thisCost = maintenanceDiscount * structureTemplate->getCityMaintenanceAtRank(city->getCityRank() - 1);
+				thisCost = CreditScale::credits(maintenanceDiscount * structureTemplate->getCityMaintenanceAtRank(city->getCityRank() - 1));
 				totalPaid += collectCivicStructureMaintenance(structure, city, thisCost);
 			}
 		} else {
-			thisCost = maintenanceDiscount * 1500;
+			thisCost = CreditScale::credits(maintenanceDiscount * 1500);
 			totalPaid += collectNonStructureMaintenance(decoration, city, thisCost);
 		}
 	}
 
 	for(int i = city->getMissionTerminalCount() - 1; i >= 0; i--) {
-		thisCost = maintenanceDiscount * 1500;
+		thisCost = CreditScale::credits(maintenanceDiscount * 1500);
 		totalPaid += collectNonStructureMaintenance(city->getCityMissionTerminal(i), city, thisCost);
 	}
 
 	for(int i = city->getSkillTrainerCount() -1; i >=0; i--) {
-		thisCost = maintenanceDiscount * 1500;
+		thisCost = CreditScale::credits(maintenanceDiscount * 1500);
 		totalPaid += collectNonStructureMaintenance(city->getCitySkillTrainer(i), city, thisCost);
 	}
 
 	if(city->isRegistered()) {
-		thisCost = maintenanceDiscount * 5000;
+		thisCost = CreditScale::credits(maintenanceDiscount * 5000);
 
 		if(city->getCityTreasury() >= thisCost) {
 			city->subtractFromCityTreasury(thisCost);
@@ -914,7 +915,7 @@ void CityManagerImplementation::deductCityMaintenance(CityRegion* city) {
 		const CitySpecialization* spec = getCitySpecialization(city->getCitySpecialization());
 
 		if (spec != nullptr) {
-			thisCost = maintenanceDiscount * spec->getCost();
+			thisCost = CreditScale::credits(maintenanceDiscount * spec->getCost());
 
 			if(city->getCityTreasury() >= thisCost) {
 				city->subtractFromCityTreasury(thisCost);
@@ -1962,7 +1963,7 @@ void CityManagerImplementation::sendMaintenanceReport(CityRegion* city, Creature
 			Reference<SharedStructureObjectTemplate*> serverTemplate = cast<SharedStructureObjectTemplate*> (cityHall->getObjectTemplate());
 
 			if (serverTemplate != nullptr) {
-				int thiscost = maintenanceDiscount * serverTemplate->getCityMaintenanceAtRank(city->getCityRank()-1);
+				int thiscost = CreditScale::credits(maintenanceDiscount * serverTemplate->getCityMaintenanceAtRank(city->getCityRank()-1));
 
 				totalcost += thiscost;
 
@@ -1975,8 +1976,8 @@ void CityManagerImplementation::sendMaintenanceReport(CityRegion* city, Creature
 	}
 
 	if (city->isRegistered()) {
-		totalcost += 5000;
-		maintList->addMenuItem("@city/city:map_reg_cost"); // Map Registration: 5000 credits
+		totalcost += CreditScale::credits(maintenanceDiscount * 5000);
+		maintList->addMenuItem("Map registration: " + String::valueOf(CreditScale::credits(maintenanceDiscount * 5000)) + " credits");
 	} else {
 		maintList->addMenuItem("@city/city:map_unreg"); // Map Registration: Unregistered
 	}
@@ -1985,7 +1986,7 @@ void CityManagerImplementation::sendMaintenanceReport(CityRegion* city, Creature
 		const CitySpecialization* spec = getCitySpecialization(city->getCitySpecialization());
 
 		if (spec != nullptr) {
-			int speccost = maintenanceDiscount * spec->getCost();
+			int speccost = CreditScale::credits(maintenanceDiscount * spec->getCost());
 			totalcost += speccost;
 			maintList->addMenuItem("@city/city:specialization " + String::valueOf(speccost) + " @city/city:credits");
 		}
@@ -2011,7 +2012,7 @@ void CityManagerImplementation::sendMaintenanceReport(CityRegion* city, Creature
 			Reference<SharedStructureObjectTemplate*> serverTemplate = cast<SharedStructureObjectTemplate*> (structure->getObjectTemplate());
 
 			if (serverTemplate != nullptr) {
-				int thiscost = maintenanceDiscount * serverTemplate->getCityMaintenanceAtRank(city->getCityRank()-1);
+				int thiscost = CreditScale::credits(maintenanceDiscount * serverTemplate->getCityMaintenanceAtRank(city->getCityRank()-1));
 
 				totalcost += thiscost;
 
@@ -2038,13 +2039,13 @@ void CityManagerImplementation::sendMaintenanceReport(CityRegion* city, Creature
 			Reference<SharedStructureObjectTemplate*> serverTemplate = cast<SharedStructureObjectTemplate*> (structure->getObjectTemplate());
 
 			if (serverTemplate != nullptr) {
-				int decCost = maintenanceDiscount * serverTemplate->getCityMaintenanceAtRank(city->getCityRank()-1);
+				int decCost = CreditScale::credits(maintenanceDiscount * serverTemplate->getCityMaintenanceAtRank(city->getCityRank()-1));
 				totalcost += decCost;
 				maintString += structure->getObjectName()->getFullPath() + " : " + String::valueOf(decCost) + " @city/city:credits";
 			}
 
 		} else if ( sceno != nullptr) {
-			int decCost = maintenanceDiscount * 1500;
+			int decCost = CreditScale::credits(maintenanceDiscount * 1500);
 			totalcost += decCost;
 			maintString += sceno->getObjectName()->getFullPath() + " : " + String::valueOf(decCost) + " @city/city:credits";
 		}
@@ -2058,7 +2059,7 @@ void CityManagerImplementation::sendMaintenanceReport(CityRegion* city, Creature
 		ManagedReference<SceneObject*> trainer = city->getCitySkillTrainer(i);
 
 		if (trainer != nullptr) {
-			int trainerCost = maintenanceDiscount * 1500;
+			int trainerCost = CreditScale::credits(maintenanceDiscount * 1500);
 			totalcost += trainerCost;
 			maintList->addMenuItem("@city/city:default \t" + trainer->getObjectName()->getFullPath() + " : " + String::valueOf(trainerCost) + " @city/city:credits");
 		}
@@ -2068,7 +2069,7 @@ void CityManagerImplementation::sendMaintenanceReport(CityRegion* city, Creature
 		ManagedReference<SceneObject*> term = city->getCityMissionTerminal(i);
 
 		if (term != nullptr) {
-			int terminalCost = maintenanceDiscount * 1500;
+			int terminalCost = CreditScale::credits(maintenanceDiscount * 1500);
 			totalcost += terminalCost;
 			maintList->addMenuItem("@city/city:default \t" + term->getObjectName()->getFullPath() + " : " + String::valueOf(terminalCost) + " @city/city:credits");
 		}

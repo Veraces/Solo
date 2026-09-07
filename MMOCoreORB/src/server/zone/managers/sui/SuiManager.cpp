@@ -2,6 +2,7 @@
 				Copyright <SWGEmu>
 		See file COPYING for copying conditions. */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "SuiManager.h"
 
 #include "server/zone/ZoneProcessServer.h"
@@ -421,10 +422,10 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 
 			} else if (templatePath == "credits") {
 				{
-					TransactionLog trx(TrxCode::CHARACTERBUILDER, player, 50000, true);
-					player->addCashCredits(50000, true);
+					TransactionLog trx(TrxCode::CHARACTERBUILDER, player, CreditScale::credits(50000), true);
+					player->addCashCredits(CreditScale::credits(50000), true);
 				}
-				player->sendSystemMessage("You have received 50.000 Credits");
+				player->sendSystemMessage("You have received 500 credits");
 
 			} else if (templatePath == "faction_rebel") {
 				ghost->increaseFactionStanding("rebel", 100000);

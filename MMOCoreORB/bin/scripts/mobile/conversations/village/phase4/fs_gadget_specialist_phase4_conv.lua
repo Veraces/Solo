@@ -110,7 +110,7 @@ villageGadgetSpecialistPhase4ConvoTemplate:addScreen(be_on_your_way);
 
 one_other_thing = ConvoScreen:new {
 	id = "one_other_thing",
-	leftDialog = "@conversation/fs_gadget_specialist:s_bdedc5e2", -- "Wait! Before speaking with the droid, there's one other thing. You'll need a downed satellite tracking device. When you purchase the rights to one, the droid will upload tracking data to your tracking device. It will then help you to locate the fallen satellite. I can provide you with a kit for just such a device for a small fee. Say, 530 credits?"
+	customDialogText = "Before speaking with the droid, you will need a downed satellite tracking device. When you purchase the rights to a satellite, the droid will upload tracking data to your device. I can provide the device kit for 6 credits.",
 	stopConversation = "false",
 	options = {
 		--{"@conversation/fs_gadget_specialist:s_a8749106", "place_in_inventory"}, -- "Sounds fair enough. I'll take one."
@@ -155,7 +155,7 @@ villageGadgetSpecialistPhase4ConvoTemplate:addScreen(not_enough_space);
 
 return_to_buy = ConvoScreen:new {
 	id = "return_to_buy",
-	leftDialog = "@conversation/fs_gadget_specialist:s_7045a2d7", -- "Welcome back. Still interested in a downed satellite tracking device? The price is 530 credits."
+	customDialogText = "Welcome back. Still interested in a downed satellite tracking device? The price is 6 credits.",
 	stopConversation = "false",
 	options = {
 		--{"@conversation/fs_gadget_specialist:s_a8749106", "place_in_inventory"}, -- "Sounds fair enough. I'll take one."

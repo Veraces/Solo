@@ -67,6 +67,7 @@
 #include "templates/creature/SharedCreatureObjectTemplate.h"
 
 #include "variables/Skill.h"
+#include "MovementScale.h"
 #include "server/zone/objects/player/sessions/EntertainingSession.h"
 
 #include "server/zone/packets/ui/ClientMfdStatusUpdateMessage.h"
@@ -1682,7 +1683,7 @@ float CreatureObjectImplementation::getSpeedModifier() const {
 		}
 	}
 
-	return modifier;
+	return isPlayerCreature() ? modifier * MovementScale::PLAYER_MULTIPLIER : modifier;
 }
 
 float CreatureObjectImplementation::getAccelerationModifier() const {
@@ -1694,7 +1695,7 @@ float CreatureObjectImplementation::getAccelerationModifier() const {
 		}
 	}
 
-	return modifier;
+	return isPlayerCreature() ? modifier * MovementScale::PLAYER_MULTIPLIER : modifier;
 }
 
 void CreatureObjectImplementation::sendSpeedAndAccelerationMods(SceneObject* player) {

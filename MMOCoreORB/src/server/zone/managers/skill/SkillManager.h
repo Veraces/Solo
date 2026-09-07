@@ -62,6 +62,7 @@ public:
 	void loadLuaConfig();
 	void loadClientData();
 	void loadFromLua();
+	void applyMasterSkillBonuses();
 	void loadSkill(LuaObject* skill);
 	void loadXpLimits();
 

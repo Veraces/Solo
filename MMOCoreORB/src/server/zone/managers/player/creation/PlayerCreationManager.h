@@ -71,6 +71,7 @@ class PlayerCreationManager : public Singleton<PlayerCreationManager>, public Lo
 	int startingCash;
 	int startingBank;
 	int skillPoints;
+	int startingAttributeBase;
 
 	bool freeGodMode;
 

@@ -5,6 +5,7 @@
  *      Author: Elvaron
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/creature/CreatureObject.h"
 #include "server/zone/objects/player/PlayerObject.h"
 #include "CloningTerminalMenuComponent.h"
@@ -59,7 +60,7 @@ int CloningTerminalMenuComponent::handleObjectMenuSelect(SceneObject* sceneObjec
 			cloneConfirm->setPromptText("@base_player:clone_confirm_coupon_prompt");
 		} else {
 			cloneConfirm->setPromptTitle("@base_player:clone_confirm_title");
-			cloneConfirm->setPromptText("@base_player:clone_confirm_prompt");
+			cloneConfirm->setPromptText("Store your cloning data here for " + String::valueOf(CreditScale::credits(1000)) + " credits?");
 		}
 
 		cloneConfirm->setCancelButton(true, "");

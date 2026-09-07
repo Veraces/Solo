@@ -8,6 +8,7 @@
 #ifndef INSURANCEALLCONFIRMSUICALLBACK_H_
 #define INSURANCEALLCONFIRMSUICALLBACK_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/player/sui/SuiCallback.h"
 #include "server/zone/managers/player/PlayerManager.h"
 #include "templates/params/OptionBitmask.h"
@@ -30,7 +31,7 @@ public:
 		int bank = player->getBankCredits();
 		int cash = player->getCashCredits();
 
-		int cost = 100;
+		int cost = CreditScale::credits(100);
 
 		ManagedReference<SceneObject*> term = suiBox->getUsingObject().get();
 
@@ -64,7 +65,7 @@ public:
 		int j = 0;
 		bool finished = true;
 
-		TransactionLog trxBank(player, TrxCode::INSURANCESYSTEM, 100 * insurableItems.size()); // Actual cost is set below
+		TransactionLog trxBank(player, TrxCode::INSURANCESYSTEM, cost * insurableItems.size()); // Actual cost is set below
 
 		for (int i = 0; i < insurableItems.size(); ++i) {
 			SceneObject* obj = insurableItems.get(i);

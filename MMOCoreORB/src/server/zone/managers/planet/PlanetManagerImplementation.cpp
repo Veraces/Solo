@@ -543,8 +543,17 @@ void PlanetManagerImplementation::loadTravelFares() {
 }
 
 int PlanetManagerImplementation::getTravelFare(const String& departurePlanet, const String& arrivalPlanet) {
-	int fare = travelFares.get(departurePlanet).get(arrivalPlanet);
-	return fare;
+	auto zoneServer = server->getZoneServer();
+	if (zoneServer->getZone(departurePlanet) == nullptr || zoneServer->getZone(arrivalPlanet) == nullptr)
+		return 0;
+
+	int fare = 0;
+	if (travelFares.contains(departurePlanet) && travelFares.get(departurePlanet).contains(arrivalPlanet))
+		fare = travelFares.get(departurePlanet).get(arrivalPlanet);
+
+	// Zero entries in the client table used to forbid direct interplanetary routes.
+	// New routes cost 1,000 authored credits (10 after CreditScale at purchase).
+	return fare > 0 ? fare : (departurePlanet == arrivalPlanet ? 100 : 1000);
 }
 
 Reference<SceneObject*> PlanetManagerImplementation::loadSnapshotObject(WorldSnapshotNode* node, WorldSnapshotIff* wsiff, int& totalObjects) {

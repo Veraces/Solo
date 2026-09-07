@@ -5,6 +5,7 @@
  *      Author: crush
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/structure/StructureObject.h"
 #include "server/zone/ZoneServer.h"
 #include "server/zone/Zone.h"
@@ -287,7 +288,7 @@ float StructureObjectImplementation::getMaintenanceRate() const {
 		rate *= 0.8f;
 	}
 
-	return (float)((int)rate); // Round to nearest int
+	return CreditScale::credits((int)rate);
 }
 
 String StructureObjectImplementation::getMaintenanceMods() const {

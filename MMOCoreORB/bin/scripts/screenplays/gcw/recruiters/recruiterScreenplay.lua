@@ -83,6 +83,7 @@ function recruiterScreenplay:grantBribe(pRecruiter, pPlayer, cost, factionPoints
 		return
 	end
 
+	cost = math.ceil(cost / 100)
 	if (CreatureObject(pPlayer):getCashCredits() >= cost) then
 		CreatureObject(pPlayer):subtractCashCredits(cost)
 		PlayerObject(pGhost):increaseFactionStanding(self:getRecruiterFaction(pRecruiter), factionPoints)

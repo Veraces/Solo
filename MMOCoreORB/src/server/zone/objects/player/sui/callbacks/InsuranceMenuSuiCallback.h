@@ -8,6 +8,7 @@
 #ifndef INSURANCEMENUSUICALLBACK_H_
 #define INSURANCEMENUSUICALLBACK_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/player/sui/SuiCallback.h"
 #include "server/zone/objects/player/sui/messagebox/SuiMessageBox.h"
 #include "server/zone/objects/player/sui/listbox/SuiListBox.h"
@@ -40,7 +41,7 @@ public:
 		int bank = player->getBankCredits();
 		int cash = player->getCashCredits();
 
-		int cost = 100;
+		int cost = CreditScale::credits(100);
 
 		ManagedReference<SceneObject*> term = listBox->getUsingObject().get();
 

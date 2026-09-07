@@ -303,8 +303,8 @@ function DarnDroid2:completeQuest(pPlayer)
 			removeQuestStatus(playerID .. ":DarnDroid2WaypointID")
 		end
 
-		CreatureObject(pPlayer):addBankCredits(1000, true)
-		CreatureObject(pPlayer):sendSystemMessage("Valance Serth transfers a reward of 1000 Credits")
+		CreatureObject(pPlayer):addBankCredits(math.ceil(1000 / 100), true)
+		CreatureObject(pPlayer):sendSystemMessage("Valance Serth transfers a reward of 10 Credits")
 		PlayerObject(pGhost):increaseFactionStanding("townsperson", 50)
 		CreatureObject(pPlayer):awardExperience("combat_general", 1000, true)
 		PlayerObject(pGhost):completeJournalQuestTask(self.quest2Crc, self.TASK_WIPEMEM, true);

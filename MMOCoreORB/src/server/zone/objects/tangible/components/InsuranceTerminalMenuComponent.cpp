@@ -5,6 +5,7 @@
  *      Author: Elvaron
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/creature/CreatureObject.h"
 #include "server/zone/objects/player/PlayerObject.h"
 #include "InsuranceTerminalMenuComponent.h"
@@ -51,7 +52,7 @@ int InsuranceTerminalMenuComponent::handleObjectMenuSelect(SceneObject* sceneObj
 		ManagedReference<SuiListBox*> suiInsuranceMenuBox = new SuiListBox(player, SuiWindowType::INSURANCE_MENU, SuiListBox::HANDLETHREEBUTTON);
 
 		suiInsuranceMenuBox->setPromptTitle("@sui:mnu_insure");
-		suiInsuranceMenuBox->setPromptText("Select which items you would like to buy insurance for from the list below.");
+		suiInsuranceMenuBox->setPromptText("Select the items to insure. Insurance costs " + String::valueOf(CreditScale::credits(100)) + " credit per item.");
 
 		bool found = false;
 

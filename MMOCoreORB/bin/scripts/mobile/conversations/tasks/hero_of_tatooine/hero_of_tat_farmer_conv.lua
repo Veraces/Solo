@@ -65,7 +65,7 @@ heroOfTatFarmerConvoTemplate:addScreen(tracks_leading_away);
 
 ransom_cost = ConvoScreen:new {
 	id = "ransom_cost",
-	leftDialog = "@conversation/quest_hero_of_tatooine_farmer:s_bed5a497", -- The note says that I need to pay ten thousand credits. But I barely break even as a moisture farmer. I don't have that kind of money!
+	customDialogText = "The note says that I need to pay 100 credits. But I barely break even as a moisture farmer. I do not have that kind of money!",
 	stopConversation = "false",
 	options = {
 		{"@conversation/quest_hero_of_tatooine_farmer:s_c1d778b6", "a_lot_of_money"}, -- I will give you the ransom money.

@@ -5,6 +5,7 @@
 #ifndef MISSIONOBJECTDELTAMESSAGE3_H_
 #define MISSIONOBJECTDELTAMESSAGE3_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/packets/DeltaMessage.h"
 #include "server/zone/objects/mission/MissionObject.h"
 
@@ -48,7 +49,7 @@ public:
 	void updateRewardCredits(int creds) {
 		startUpdate(0x08);
 
-		insertInt(creds);
+		insertInt(CreditScale::credits(creds));
 	}
 
 	void updateRefreshCount(uint32 trc) {

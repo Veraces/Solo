@@ -5,6 +5,7 @@
 #ifndef TIPCOMMAND_H_
 #define TIPCOMMAND_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/scene/SceneObject.h"
 #include "server/zone/objects/player/PlayerObject.h"
 #include "server/zone/objects/player/sui/callbacks/TipCommandSuiCallback.h"
@@ -99,7 +100,8 @@ private:
 				new TipCommandSuiCallback(server->getZoneServer(),
 						targetPlayer, amount));
 
-		String promptText = "@base_player:tip_wire_prompt"; // A surcharge of 5% will be added to your requested bank-to-bank transfer amount. Would you like to continue?
+		int surcharge = CreditScale::credits(amount < 21 ? 1 : (int)round(amount * 0.05));
+		String promptText = "The bank transfer fee is " + String::valueOf(surcharge) + " credits. Continue?";
 
 		if (ConfigManager::instance()->getBool("Core3.SameAccountTipsAreFree", false)) {
 			auto dstGhost = targetPlayer->getPlayerObject();

@@ -5,6 +5,7 @@
  *      Author: victor
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/creature/VehicleObject.h"
 #include "server/zone/packets/object/ObjectMenuResponse.h"
 #include "server/zone/objects/creature/CreatureObject.h"
@@ -238,6 +239,7 @@ void VehicleObjectImplementation::sendRepairConfirmTo(CreatureObject* player) {
 	if(city != nullptr && city->getGarageTax() > 0){
 		repairCost += repairCost * city->getGarageTax() / 100;
 	}
+	repairCost = CreditScale::credits(repairCost);
 
 	listbox->addMenuItem("@pet/pet_menu:vehicle_prompt " + getDisplayedName()); //Vehicle:
 	listbox->addMenuItem("@pet/pet_menu:repair_cost_prompt " + String::valueOf(repairCost)); //Repair Cost:

@@ -224,7 +224,7 @@ function heraldScreenPlay:giveMultiDestWaypoint(pPlayer, heraldNum, locNum)
 	end
 
 	if destCost ~= nil and destCost > 0 then
-		CreatureObject(pPlayer):subtractCashCredits(destCost)
+		CreatureObject(pPlayer):subtractCashCredits(math.ceil(destCost / 100))
 	end
 
 	local pWaypoint = PlayerObject(pGhost):getWaypointAt(x, y, heraldData.planet)

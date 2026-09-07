@@ -223,7 +223,7 @@ museumCuratorConvoTemplate:addScreen(in_more_than_a_week);
 
 schematic_cost = ConvoScreen:new {
 	id = "schematic_cost",
-	leftDialog = "@conversation/lilas_dinhint:s_486f6", -- I'm asking for a modest... ahem... donation to the museum of 48,000 credits in exchange for the schematic. Oh, and I should warn you that some knowledge of advanced furniture production is required.
+	customDialogText = "I am asking for a donation of 480 credits to the museum in exchange for the schematic. Some knowledge of advanced furniture production is required.",
 	stopConversation = "false",
 	options = {}
 }

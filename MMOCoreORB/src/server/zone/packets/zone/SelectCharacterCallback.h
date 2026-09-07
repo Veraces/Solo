@@ -349,6 +349,9 @@ public:
 		}
 
 		SkillModManager::instance()->verifyWearableSkillMods(player);
+		// Refresh saved master-box bonuses and movement values for existing characters.
+		SkillModManager::instance()->verifySkillBoxSkillMods(player);
+		player->updateSpeedAndAccelerationMods();
 	}
 
 	void run() {

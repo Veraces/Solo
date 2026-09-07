@@ -103,15 +103,8 @@ public:
 	}
 
 
-	float getDensityAt(float x, float y) const {
-		x -= minX;
-		y = maxY - y;
-		float value = SimplexNoise::noise(x * modifier, y * modifier, seed * modifier);
-
-		if(value < 0)
-			return 0;
-
-		return value * density;
+	float getDensityAt(float, float) const {
+		return 1.0f;
 	}
 
 	void print() const {
@@ -123,9 +116,10 @@ private:
 	/**
 	 * Initializes class
 	 * \param ore Boolean value to see if map is ore
-	 * \param concentration to determine density
+	 * The concentration tier is retained in the constructor API for compatibility;
+	 * all maps now use full density.
 	 */
-	void initialize(bool ore, short concentration) {
+	void initialize(bool ore, short) {
 		seed = System::random(time(0));
 
 		if(ore)
@@ -133,19 +127,7 @@ private:
 		else
 			modifier = .0006f;
 
-		switch(concentration) {
-		case 1:
-			density = (System::random(9) + 90) / 100.0f;
-			break;
-		case 2:
-			density = (System::random(20) + 75) / 100.0f;
-			break;
-		case 3:
-			density = (System::random(25) + 50) / 100.0f;
-			break;
-		default:
-			density = (System::random(25) + 50) / 100.0f;
-		}
+		density = 1.0f;
 
 		totalUnits = System::random(5000000) + 5000000;
 

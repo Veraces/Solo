@@ -108,6 +108,7 @@ void SkillManager::loadClientData() {
 	}
 
 	loadFromLua();
+	applyMasterSkillBonuses();
 
 	//If the admin ability isn't in the ability map, then we want to add it manually.
 	if (!abilityMap.containsKey("admin"))
@@ -125,6 +126,25 @@ void SkillManager::loadClientData() {
 
 	info(true) << "Successfully loaded " << skillMap.size() <<
 	       	" skills and " << abilityMap.size() << " abilities.";
+}
+
+void SkillManager::applyMasterSkillBonuses() {
+	// Add to the loaded skill boxes so training, surrender and login use the same values.
+	auto addBonus = [this](const String& skillName, const String& modifier) {
+		Skill* skill = getSkill(skillName);
+		if (skill == nullptr) {
+			warning("Cannot apply master skill bonus: " + skillName);
+			return;
+		}
+
+		int original = skill->skillModifiers.contains(modifier) ? skill->skillModifiers.get(modifier) : 0;
+		skill->skillModifiers.put(modifier, original + 25);
+	};
+
+	addBonus("social_dancer_master", "healing_dance_mind");
+	addBonus("social_musician_master", "healing_music_mind");
+	addBonus("science_doctor_master", "healing_wound_treatment");
+	addBonus("science_doctor_master", "healing_wound_speed");
 }
 
 void SkillManager::loadFromLua() {

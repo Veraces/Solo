@@ -54,7 +54,7 @@ function eventPromoterScreenplay:sendSaleSui(pNpc, pPlayer, screenID)
 
 	local options = { }
 	for i = 1, #perkData, 1 do
-		local perk = {getStringId(perkData[i].displayName) .. " (Cost: " .. perkData[i].cost .. ")", 0}
+		local perk = {getStringId(perkData[i].displayName) .. " (Cost: " .. math.ceil(perkData[i].cost / 100) .. ")", 0}
 		table.insert(options, perk)
 	end
 
@@ -124,7 +124,8 @@ function eventPromoterScreenplay:giveItem(pPlayer, deedData)
 		return
 	end
 
-	if (CreatureObject(pPlayer):getCashCredits() < deedData.cost) then
+	local cost = math.ceil(deedData.cost / 100)
+	if (CreatureObject(pPlayer):getCashCredits() < cost) then
 		CreatureObject(pPlayer):sendSystemMessage("@dispenser:insufficient_funds")
 		return
 	elseif (SceneObject(pInventory):isContainerFullRecursive()) then
@@ -140,7 +141,7 @@ function eventPromoterScreenplay:giveItem(pPlayer, deedData)
 		end
 	end
 
-	CreatureObject(pPlayer):subtractCashCredits(deedData.cost)
+	CreatureObject(pPlayer):subtractCashCredits(cost)
 
 	local templatePath
 	if string.find(deedData.template, ".iff") then

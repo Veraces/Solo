@@ -1,4 +1,5 @@
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "FactionRecruiterContainerComponent.h"
 #include "server/chat/ChatManager.h"
 #include "server/zone/objects/creature/ai/AiAgent.h"
@@ -106,7 +107,7 @@ bool FactionRecruiterContainerComponent::transferObject(SceneObject* sceneObject
 	object->destroyObjectFromWorld(true);
 	object->destroyObjectFromDatabase();
 
-	int credits = System::random(500) + 500;
+	int credits = CreditScale::credits(System::random(500) + 500);
 	{
 		TransactionLog trx(faction == "rebel" ? TrxCode::REBELFACTION : TrxCode::IMPERIALFACTION, player, credits, true);
 		player->sendSystemMessage("You receive " + String::valueOf(credits) + " credits.");

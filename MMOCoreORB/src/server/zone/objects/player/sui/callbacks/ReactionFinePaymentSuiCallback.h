@@ -1,6 +1,7 @@
 #ifndef REACTIONFINEPAYMENTSUICALLBACK_H_
 #define REACTIONFINEPAYMENTSUICALLBACK_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/player/sui/SuiCallback.h"
 #include "server/zone/objects/player/PlayerObject.h"
 #include "server/zone/objects/transaction/TransactionLog.h"
@@ -45,8 +46,8 @@ public:
 		Locker clocker(emoteTarget, creature);
 
 		if (totalFine > playerCredits) {
-			if (totalFine > 1000000) {
-				totalFine = 1000000;
+			if (totalFine > CreditScale::credits(1000000)) {
+				totalFine = CreditScale::credits(1000000);
 				chatManager->broadcastChatMessage(emoteTarget, reactionManager->getReactionQuip(41), 0, 0, emoteTarget->getMoodID());
 			}
 

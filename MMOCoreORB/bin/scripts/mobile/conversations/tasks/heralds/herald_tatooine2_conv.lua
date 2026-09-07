@@ -57,7 +57,7 @@ heraldTatooine2ConvoTemplate:addScreen(list_locs);
 
 sixty_credits = ConvoScreen:new {
 	id = "sixty_credits",
-	leftDialog = "@conversation/heraldtatooine2:s_5ee77a06", -- That'll be, uh.. 20 credits? No--60 credits!
+	customDialogText = "That will be 1 credit for the hideout location.",
 	stopConversation = "false",
 	options = {
 		{"@conversation/heraldtatooine2:s_34cffb60", "so_cheap"}, -- No way!
@@ -68,7 +68,7 @@ heraldTatooine2ConvoTemplate:addScreen(sixty_credits);
 
 so_cheap = ConvoScreen:new {
 	id = "so_cheap",
-	leftDialog = "@conversation/heraldtatooine2:s_6b184c6", -- You're so cheap! I'm desperate here! You think I'm going to sell out my own people for less than 60 credits? You're nuts! Get lost!
+	customDialogText = "You think I will sell out my own people for less than 1 credit? Get lost!",
 	stopConversation = "true",
 	options = {}
 }
@@ -76,7 +76,7 @@ heraldTatooine2ConvoTemplate:addScreen(so_cheap);
 
 sixty_credits_please = ConvoScreen:new {
 	id = "sixty_credits_please",
-	leftDialog = "@conversation/heraldtatooine2:s_74ed5d50", -- 60 credits, please. And don't think about cheating on me, here. This information is dangerous to be passing around, especially without pay.
+	customDialogText = "1 credit, please. This information is dangerous to be passing around without pay.",
 	stopConversation = "false",
 	options = {
 		--{"@conversation/heraldtatooine2:s_c3dbbcab", "loc1"}, -- Fine, here.
@@ -112,7 +112,7 @@ heraldTatooine2ConvoTemplate:addScreen(sad_story);
 
 thirty_fifty_credits = ConvoScreen:new {
 	id = "thirty_fifty_credits",
-	leftDialog = "@conversation/heraldtatooine2:s_ea388738", -- I'll give you the information for... 30 credits. That's right. 30 credits for a general location and 50 credits for an exact location.
+	customDialogText = "I can give you either the general location or the exact location for 1 credit.",
 	stopConversation = "false",
 	options = {
 		{"@conversation/heraldtatooine2:s_c41d4bce", "find_someone_else"}, -- No. I'm out of here.
@@ -132,7 +132,7 @@ heraldTatooine2ConvoTemplate:addScreen(find_someone_else);
 
 fifty_credits_please = ConvoScreen:new {
 	id = "fifty_credits_please",
-	leftDialog = "@conversation/heraldtatooine2:s_17daabb0", -- 50 credits, please.
+	customDialogText = "1 credit, please.",
 	stopConversation = "false",
 	options = {
 		--{"@conversation/heraldtatooine2:s_4440ce87", "go_away"}, -- I changed my mind.
@@ -168,7 +168,7 @@ heraldTatooine2ConvoTemplate:addScreen(jip_me);
 
 be_thirty_credits = ConvoScreen:new {
 	id = "be_thirty_credits",
-	leftDialog = "@conversation/heraldtatooine2:s_6cf09e8e", -- That'll be 30 credits. Do you have the money?
+	customDialogText = "That will be 1 credit. Do you have the money?",
 	stopConversation = "false",
 	options = {
 		--{"@conversation/heraldtatooine2:s_d9903b42", "loc3"}, -- Yes, I do. Here you are.
@@ -204,7 +204,7 @@ heraldTatooine2ConvoTemplate:addScreen(bury_you);
 
 thirty_credits = ConvoScreen:new {
 	id = "thirty_credits",
-	leftDialog = "@conversation/heraldtatooine2:s_5abff6d6", -- I ought to give you the location for free just to see you get a whoopin'! HA! Anyway, the Tusken Bunker is on sale for 30 credits. How about it?
+	customDialogText = "The Tusken Bunker location is on sale for 1 credit. How about it?",
 	stopConversation = "false",
 	options = {
 		{"@conversation/heraldtatooine2:s_c885bfb0", "get_lost"}, -- I'm going to pass.
@@ -223,7 +223,7 @@ heraldTatooine2ConvoTemplate:addScreen(get_lost);
 
 thatll_be_thirty = ConvoScreen:new {
 	id = "thatll_be_thirty",
-	leftDialog = "@conversation/heraldtatooine2:s_3d3f67a4", -- That'll be... 30 credits!
+	customDialogText = "That will be 1 credit!",
 	stopConversation = "false",
 	options = {
 		--{"@conversation/heraldtatooine2:s_63855d3f", "not_surprised"}, -- Oh, look at that. I don't have the money.

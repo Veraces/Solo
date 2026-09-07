@@ -8,6 +8,7 @@
 #ifndef TIPBANKSUICALLBACK_H_
 #define TIPBANKSUICALLBACK_H_
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/player/sui/SuiCallback.h"
 #include "server/zone/objects/player/PlayerObject.h"
 #include "server/chat/ChatManager.h"
@@ -34,7 +35,7 @@ public:
 
 		// Player must have sufficient funds including surcharge
 		int cash = player->getBankCredits();
-		int surcharge = amount < 21 ? 1 : round(amount * 0.05); // minimum surcharge is 1c as per Live.
+		int surcharge = CreditScale::credits(amount < 21 ? 1 : (int)round(amount * 0.05));
 
 		TransactionLog trxFee(player, TrxCode::TIPSURCHARGE, surcharge, false);
 

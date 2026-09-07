@@ -1963,6 +1963,7 @@ function ThemeParkLogic:giveCredits(pConversingPlayer, amount)
 		return
 	end
 
+	amount = math.ceil(amount / 100)
 	CreatureObject(pConversingPlayer):addCashCredits(amount, true)
 	CreatureObject(pConversingPlayer):sendSystemMessageWithDI("@theme_park/messages:theme_park_credits_pp", amount)
 end

@@ -238,34 +238,34 @@ function NymConvoHandler:runMooreScreenHandlers(pConvTemplate, pPlayer, pNpc, se
 		end
 	end
 	if (screenID == "what_you_got") then
-		if (playerCredits >= 50) then
-			clonedConversation:addOption("@celebrity/imperial_bribe:give_50", "medium_info")
+		if (playerCredits >= math.ceil(50 / 100)) then
+			clonedConversation:addOption("Offer 1 credit.", "medium_info")
 		else
-			clonedConversation:addOption("@celebrity/imperial_bribe:give_50", "you_got_nothing")
+			clonedConversation:addOption("Offer 1 credit.", "you_got_nothing")
 		end
-		if (playerCredits >= 100) then
-			clonedConversation:addOption("@celebrity/imperial_bribe:give_100", "the_good_stuff")
+		if (playerCredits >= math.ceil(100 / 100)) then
+			clonedConversation:addOption("Offer 1 credit for the better information.", "the_good_stuff")
 		else
-			clonedConversation:addOption("@celebrity/imperial_bribe:give_100", "you_got_nothing")
+			clonedConversation:addOption("Offer 1 credit for the better information.", "you_got_nothing")
 		end
 	elseif (screenID == "medium_info") then
-		CreatureObject(pPlayer):subtractCashCredits(50)
+		CreatureObject(pPlayer):subtractCashCredits(math.ceil(50 / 100))
 	elseif (screenID == "the_good_stuff") then
-		CreatureObject(pPlayer):subtractCashCredits(100)
+		CreatureObject(pPlayer):subtractCashCredits(math.ceil(100 / 100))
 	elseif (screenID == "need_more_cash") then
-		if (playerCredits >= 100) then
-			clonedConversation:addOption("@celebrity/imperial_bribe:add_100_bribe", "end_droideka_info")
+		if (playerCredits >= math.ceil(100 / 100)) then
+			clonedConversation:addOption("Offer another 1 credit.", "end_droideka_info")
 		else
-			clonedConversation:addOption("@celebrity/imperial_bribe:add_100_bribe", "you_got_nothing")
+			clonedConversation:addOption("Offer another 1 credit.", "you_got_nothing")
 		end
 	elseif (screenID == "need_more_money") then
-		if (playerCredits >= 100) then
-			clonedConversation:addOption("@celebrity/imperial_bribe:add_100_bribe", "end_base_info")
+		if (playerCredits >= math.ceil(100 / 100)) then
+			clonedConversation:addOption("Offer another 1 credit.", "end_base_info")
 		else
-			clonedConversation:addOption("@celebrity/imperial_bribe:add_100_bribe", "you_got_nothing")
+			clonedConversation:addOption("Offer another 1 credit.", "you_got_nothing")
 		end
 	elseif ((screenID == "end_base_info") or (screenID == "end_droideka_info")) then
-		CreatureObject(pPlayer):subtractCashCredits(100)
+		CreatureObject(pPlayer):subtractCashCredits(math.ceil(100 / 100))
 	end
 	if (screenID ~= "leave_me_alone" and screenID ~= "what_you_got") then
 		clonedConversation:addOption("@celebrity/imperial_bribe:end_convo", "thats_all")
@@ -379,7 +379,7 @@ function NymConvoHandler:runBeremaScreenHandlers(pConvTemplate, pPlayer, pNpc, s
 	end
 	if screenID == "you_win_s" or screenID == "you_win_bh" or screenID == "you_win_td" or screenID == "begin_game_five_wins" then
 		CreatureObject(pPlayer):sendSystemMessage("@theme_park_nym/messages:card_winner")
-		CreatureObject(pPlayer):addCashCredits(curBet * 2, false)
+		CreatureObject(pPlayer):addCashCredits(math.ceil(curBet * 2 / 100), false)
 		if (screenID ~= "begin_game_five_wins") then
 			clonedConversation:addOption("@celebrity/lok_gambler:play_again", "bet_how_much")
 			clonedConversation:addOption("@celebrity/lok_gambler:leaving", "good_luck")
@@ -388,7 +388,7 @@ function NymConvoHandler:runBeremaScreenHandlers(pConvTemplate, pPlayer, pNpc, s
 	if screenID == "you_lose_s" or screenID == "you_lose_td" or screenID == "you_lose_bh" or screenID == "tie" then
 		if (screenID == "tie") then
 			CreatureObject(pPlayer):sendSystemMessage("@theme_park_nym/messages:card_tie")
-			CreatureObject(pPlayer):addCashCredits(curBet, false)
+			CreatureObject(pPlayer):addCashCredits(math.ceil(curBet / 100), false)
 		else
 			CreatureObject(pPlayer):sendSystemMessage("@theme_park_nym/messages:card_loser")
 		end
@@ -397,22 +397,22 @@ function NymConvoHandler:runBeremaScreenHandlers(pConvTemplate, pPlayer, pNpc, s
 	end
 	if screenID == "begin_game_5" then
 		self:writeObjectData(objectID, "curBet", 5, "nym_gambler")
-		CreatureObject(pPlayer):subtractCashCredits(5)
+		CreatureObject(pPlayer):subtractCashCredits(math.ceil(5 / 100))
 	elseif screenID == "begin_game_10" then
 		self:writeObjectData(objectID, "curBet", 10, "nym_gambler")
-		CreatureObject(pPlayer):subtractCashCredits(10)
+		CreatureObject(pPlayer):subtractCashCredits(math.ceil(10 / 100))
 	elseif screenID == "begin_game_50" then
 		self:writeObjectData(objectID, "curBet", 50, "nym_gambler")
-		CreatureObject(pPlayer):subtractCashCredits(50)
+		CreatureObject(pPlayer):subtractCashCredits(math.ceil(50 / 100))
 	elseif screenID == "bet_how_much" then
-		if (playerCredits >= 5) then
-			clonedConversation:addOption("@celebrity/lok_gambler:bet_made_5", "begin_game_5")
+		if (playerCredits >= math.ceil(5 / 100)) then
+			clonedConversation:addOption("Bet 1 credit (small wager).", "begin_game_5")
 		end
-		if (playerCredits >= 10) then
-			clonedConversation:addOption("@celebrity/lok_gambler:bet_made_10", "begin_game_10")
+		if (playerCredits >= math.ceil(10 / 100)) then
+			clonedConversation:addOption("Bet 1 credit (medium wager).", "begin_game_10")
 		end
-		if (playerCredits >= 50) then
-			clonedConversation:addOption("@celebrity/lok_gambler:bet_made_50", "begin_game_50")
+		if (playerCredits >= math.ceil(50 / 100)) then
+			clonedConversation:addOption("Bet 1 credit (large wager).", "begin_game_50")
 		end
 	end
 	return pConvScreen

@@ -5,6 +5,7 @@
  *      Author: Kyle
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "VendorDataComponent.h"
 #include "server/zone/ZoneServer.h"
 #include "server/zone/managers/vendor/VendorManager.h"
@@ -216,7 +217,7 @@ void VendorDataComponent::runVendorUpdate() {
 float VendorDataComponent::getMaintenanceRate() {
 	ManagedReference<SceneObject*> strongParent = parent.get();
 	if (strongParent == nullptr || strongParent->getZoneServer() == nullptr)
-		return 15.f;
+		return CreditScale::credits(15);
 
 	// 15 credits base maintenance
 	float maintRate = 15.f;
@@ -234,7 +235,7 @@ float VendorDataComponent::getMaintenanceRate() {
 	if (registered)
 		maintRate += 6.f;
 
-	return maintRate;
+	return CreditScale::credits(maintRate);
 }
 
 void VendorDataComponent::payMaintanence() {

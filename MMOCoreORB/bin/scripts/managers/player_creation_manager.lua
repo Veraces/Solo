@@ -9,6 +9,9 @@ startingBank = 1000
 --How many skill points a new characters start with
 skillPoints = 5000 --250
 
+--Base value applied to all nine HAM attributes before profession and racial modifiers
+startingAttributeBase = 2500
+
 professions = {
 	"combat_brawler",
 	"combat_marksman",

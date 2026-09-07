@@ -528,7 +528,7 @@ ResourceSpawn* ResourceSpawner::createResourceSpawn(const String& type,
 		newSpawn->addAttribute(attribName, randomValue);
 	}
 
-	long expires = getRandomExpirationTime(resourceEntry);
+	long expires = getExpirationTime();
 	newSpawn->setDespawned(expires);
 
 	newSpawn->setZoneRestriction(resourceEntry->getZoneRestriction());
@@ -621,21 +621,11 @@ int ResourceSpawner::randomizeValue(int min, int max) {
 	return randomStat;
 }
 
-long ResourceSpawner::getRandomExpirationTime(const ResourceTreeEntry* resourceEntry) {
-	if (resourceEntry->isOrganic())
-		return getRandomUnixTimestamp(6, 22);
+long ResourceSpawner::getExpirationTime() const {
+	constexpr long resourceSpawnDurationDays = 365;
+	constexpr long secondsPerDay = 24 * 60 * 60;
 
-	else if (resourceEntry->isJTL())
-		return getRandomUnixTimestamp(13, 22);
-
-	else
-		return getRandomUnixTimestamp(6, 11);
-}
-
-long ResourceSpawner::getRandomUnixTimestamp(int min, int max) const {
-	return time(0) + (System::random((max * shiftDuration) - (min
-			* shiftDuration)) + min * shiftDuration);
-
+	return time(0) + (resourceSpawnDurationDays * secondsPerDay);
 }
 
 const Vector<String>& ResourceSpawner::getActiveResourceZones() const {

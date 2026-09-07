@@ -5,6 +5,7 @@
  *      Author: loshult
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/managers/combat/CombatManager.h"
 #include "server/zone/managers/faction/FactionManager.h"
 #include "server/zone/managers/gcw/GCWManager.h"
@@ -418,7 +419,7 @@ void ContrabandScanSessionImplementation::sendContrabandFineSuiWindow(Zone* zone
 		return;
 	}
 
-	fineToPay = numberOfContrabandItems * zone->getGCWManager()->getCrackdownContrabandFineCredits();
+	fineToPay = CreditScale::credits(numberOfContrabandItems * zone->getGCWManager()->getCrackdownContrabandFineCredits());
 
 	removeFineSuiWindow(player);
 

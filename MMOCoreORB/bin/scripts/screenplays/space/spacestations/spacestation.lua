@@ -120,7 +120,7 @@ function SpaceStationScreenPlay:getRepairCost(pShip, repairPercent)
 		print("getRepairCost -- Total repair cost estimate = " .. totalCost)
 	end
 
-	return totalCost
+	return math.ceil(totalCost / 100)
 end
 
 function SpaceStationScreenPlay:repairShip(pPlayer, pShip, repairPercent, pSpaceStation, decay)

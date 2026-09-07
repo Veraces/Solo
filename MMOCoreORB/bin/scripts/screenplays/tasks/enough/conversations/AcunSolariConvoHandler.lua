@@ -71,7 +71,7 @@ function AcunSolariConvoHandler:runScreenHandlers(pConvTemplate, pPlayer, pNpc, 
 		-- Give reward
 		ghost:increaseFactionStanding(faction, questTask:getFactionAmount())
 
-		local creditsAmount = questTask:getBankCredits()
+		local creditsAmount = math.ceil(questTask:getBankCredits() / 100)
 		CreatureObject(pPlayer):addBankCredits(creditsAmount, true)
 
 		CreatureObject(pPlayer):sendSystemMessage("You recieve " .. creditsAmount .. " credits for completing your task.")

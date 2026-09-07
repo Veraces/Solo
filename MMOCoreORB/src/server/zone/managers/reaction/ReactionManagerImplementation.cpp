@@ -1,3 +1,4 @@
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/Zone.h"
 #include "server/chat/ChatManager.h"
 #include "server/zone/managers/reaction/ReactionManager.h"
@@ -347,10 +348,11 @@ void ReactionManagerImplementation::reactionFine(CreatureObject* emoteUser, AiAg
 	}
 
 	if (reactionFine->getCreditFine() != 0) {
+		int creditFine = CreditScale::credits(reactionFine->getCreditFine());
 		StringBuffer suiFineMsg;
-		suiFineMsg << "@stormtrooper_attitude/st_response:imperial_fine_" << String::valueOf(reactionFine->getCreditFine());
+		suiFineMsg << "You have been fined " << creditFine << " credits.";
 		if (ghost->getReactionFines() != 0) {
-			suiFineMsg << " @stormtrooper_attitude/st_response:imperial_fine_outstanding " << String::valueOf(ghost->getReactionFines() + reactionFine->getCreditFine()) << " @stormtrooper_attitude/st_response:imperial_fine_credits";
+			suiFineMsg << " @stormtrooper_attitude/st_response:imperial_fine_outstanding " << String::valueOf(ghost->getReactionFines() + creditFine) << " @stormtrooper_attitude/st_response:imperial_fine_credits";
 		} else {
 			ghost->updateReactionFineTimestamp();
 		}
@@ -364,7 +366,7 @@ void ReactionManagerImplementation::reactionFine(CreatureObject* emoteUser, AiAg
 		ghost->addSuiBox(box);
 		emoteUser->sendMessage(box->generateMessage());
 
-		ghost->addToReactionFines(reactionFine->getCreditFine());
+		ghost->addToReactionFines(creditFine);
 
 	}
 }

@@ -411,8 +411,8 @@ function SecretsOfTheSyren:giveItems(pPlayer, taskIndex, questCrc)
 		if pItem == nil then
 			printLuaError("Unable to give syren1_warning in SecretsOfTheSyren to player " .. creature:getObjectID())
 		end
-		creature:addCashCredits(5000, true)
-		creature:sendSystemMessage("Tovar Blackmoor gave you 5000 credits and a Shisha schematic.")
+		creature:addCashCredits(math.ceil(5000 / 100), true)
+		creature:sendSystemMessage("Tovar Blackmoor gave you 50 credits and a Shisha schematic.")
 		local faction = creature:getFaction()
 		if faction == FACTIONREBEL or faction == FACTIONIMPERIAL then
 			local awardFaction

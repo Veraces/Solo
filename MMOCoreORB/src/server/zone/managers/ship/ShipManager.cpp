@@ -5,6 +5,7 @@
  *      Author: victor
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "ShipManager.h"
 
 #include "server/ServerCore.h"
@@ -738,6 +739,8 @@ bool ShipManager::createDeedFromChassis(CreatureObject* player, ShipChassisCompo
 
 	// Check player has the cash
 	int playerCash = player->getCashCredits();
+
+	shipCost = CreditScale::credits(shipCost);
 
 	if (shipCost > playerCash) {
 		chatManager->broadcastChatMessage(chassisDealer, "@chassis_npc:no_money", player->getObjectID(), 0, chassisDealer->getMoodID());

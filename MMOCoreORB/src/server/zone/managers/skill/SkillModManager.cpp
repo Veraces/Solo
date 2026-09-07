@@ -253,6 +253,15 @@ void SkillModManager::verifySkillBoxSkillMods(CreatureObject* creature) {
 		}
 	}
 
+	// Reconcile expected values, including modifiers absent from an older save.
+	// Use the difference so reconnecting or retraining never stacks the bonus.
+	for (int i = 0; i < mods.size(); ++i) {
+		const String& name = mods.elementAt(i).getKey();
+		int difference = mods.get(name) - creature->getSkillModOfType(name, SKILLBOX);
+		if (difference != 0)
+			creature->addSkillMod(SKILLBOX, name, difference, true);
+	}
+
 	if(!compareMods(mods, creature, SKILLBOX)) {
 		creature->info() << "SkillBox mods don't match";
 	}

@@ -5,6 +5,7 @@
  *      Author: victor
  */
 
+#include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/managers/auction/AuctionManager.h"
 #include "server/zone/managers/auction/AuctionsMap.h"
 #include "server/zone/managers/object/ObjectManager.h"
@@ -35,6 +36,17 @@
 #include "AuctionSearchTask.h"
 #include "server/zone/objects/factorycrate/FactoryCrate.h"
 #include "server/zone/objects/transaction/TransactionLog.h"
+
+namespace {
+int bazaarListingFee(CreatureObject* player, bool premium) {
+	float reduction = 1.0f;
+	if (player->hasSkill("crafting_merchant_sales_01"))
+		reduction = 0.8f;
+	if (player->hasSkill("crafting_merchant_sales_03"))
+		reduction = 0.6f;
+	return CreditScale::credits((int)(reduction * AuctionManager::SALESFEE * (premium ? 5 : 1)));
+}
+}
 
 void AuctionManagerImplementation::initialize() {
 	Locker locker(_this.getReferenceUnsafeStaticCast());
@@ -668,22 +680,10 @@ void AuctionManagerImplementation::addSaleItem(CreatureObject* player, uint64 ob
 	if (vendor->isBazaarTerminal()) {
 		StringIdChatParameter str("@base_player:sale_fee"); // The fee for your listing is %DI credits.
 
-		float costReduction = 1;
-		if(player->hasSkill("crafting_merchant_sales_01"))
-				costReduction = .80f;
-		if(player->hasSkill("crafting_merchant_sales_03"))
-				costReduction = .60f;
-
-		if (item->isPremiumAuction()) {
-			TransactionLog trx(player, TrxCode::BAZAARSYSTEM, costReduction * (SALESFEE * 5), false);
-			player->subtractBankCredits(costReduction * (SALESFEE * 5));
-			str.setDI(costReduction * (SALESFEE * 5));
-
-		} else {
-			TransactionLog trx(player, TrxCode::BAZAARSYSTEM, costReduction * SALESFEE, false);
-			player->subtractBankCredits(costReduction * SALESFEE);
-			str.setDI(costReduction * SALESFEE);
-		}
+		int fee = bazaarListingFee(player, item->isPremiumAuction());
+		TransactionLog trx(player, TrxCode::BAZAARSYSTEM, fee, false);
+		player->subtractBankCredits(fee);
+		str.setDI(fee);
 
 		player->sendSystemMessage(str);
 	}
@@ -800,10 +800,7 @@ int AuctionManagerImplementation::checkSaleItem(CreatureObject* player, SceneObj
 		if (price > MAXBAZAARPRICE)
 			return ItemSoldMessage::INVALIDSALEPRICE;
 
-		if (player->getBankCredits() < SALESFEE)
-			return ItemSoldMessage::NOTENOUGHCREDITS;
-
-		if (premium && player->getBankCredits() < SALESFEE * 5)
+		if (player->getBankCredits() < bazaarListingFee(player, premium))
 			return ItemSoldMessage::NOTENOUGHCREDITS;
 	}
 

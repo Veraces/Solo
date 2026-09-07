@@ -52,7 +52,7 @@ function BartenderConversationHandler:runScreenHandlers(pConvTemplate, pPlayer, 
 
 		for i = 1, #drinksTable, 1 do
 			local drinkName = drinksTable[i][1]
-			local drinkCost = drinksTable[i][2]
+			local drinkCost = math.ceil(drinksTable[i][2] / 100)
 			local messageString = "@food_name:" .. drinkName
 
 			pSui.add("[" .. drinkCost .. "] " .. getStringId(messageString), "")

@@ -186,8 +186,8 @@ function BestineMuseumScreenPlay:doSchematicPurchase(pPlayer)
 	local winningPainting = self:getWinningPainting()
 	local schematic = self:getSchematicTemplate(tonumber(winningArtist), tonumber(winningPainting))
 
-	CreatureObject(pPlayer):subtractCashCredits(48000)
-	CreatureObject(pPlayer):sendSystemMessage("You successfully make a payment of 48000 credits.")
+	CreatureObject(pPlayer):subtractCashCredits(math.ceil(48000 / 100))
+	CreatureObject(pPlayer):sendSystemMessage("You successfully make a payment of 480 credits.")
 	self:writeToPurchasedList(pPlayer)
 
 	local pInventory = CreatureObject(pPlayer):getSlottedObject("inventory")

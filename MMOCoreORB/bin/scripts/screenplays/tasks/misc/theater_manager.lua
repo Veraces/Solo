@@ -773,6 +773,7 @@ end
 
 -- Sends payout to player
 function TheaterManagerScreenPlay:doPayout(pPlayer, amount)
+	amount = math.ceil(amount / 100)
 	CreatureObject(pPlayer):addCashCredits(amount, true)
 	local messageString = LuaStringIdChatParameter("@quest/crowd_pleaser/system_messages:payout")
 	messageString:setDI(amount)
