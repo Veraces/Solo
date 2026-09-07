@@ -117,7 +117,9 @@ public:
 	}
 
 	bool checkTarget(CreatureObject* creature, CreatureObject* creatureTarget) const {
-		if (!creatureTarget->hasDamage(CreatureAttribute::HEALTH) && !creatureTarget->hasDamage(CreatureAttribute::ACTION)) {
+		if (!creatureTarget->hasDamage(CreatureAttribute::HEALTH)
+				&& !creatureTarget->hasDamage(CreatureAttribute::ACTION)
+				&& !creatureTarget->hasDamage(CreatureAttribute::MIND)) {
 			return false;
 		}
 

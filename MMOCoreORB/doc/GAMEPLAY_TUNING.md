@@ -1,4 +1,4 @@
-# Master skills, movement and direct travel
+# Master skills, movement, stimpacks and direct travel
 
 These changes build on the 100x credit reduction described in `CREDIT_ECONOMY.md`.
 
@@ -31,6 +31,22 @@ combat slowing still apply. NPC movement and spacecraft flight are unchanged.
 The multiplier is applied once to the player, including riders. Mount and vehicle
 base speeds are not multiplied again. The server's rider speed checks use the
 same multiplier, and player movement is refreshed at login.
+
+## Stimpacks
+
+All stimpack definitions heal Health, Action and Mind damage. The same calculated
+healing power applies to each pool, including skill and battle-fatigue modifiers.
+This includes ordinary, quest, ranged and area stims, and stims dispensed by a
+droid. Area healing also accepts patients who have only Mind damage.
+
+The normal charge consumption, cooldown, skill requirements and Mind cost to use
+a stimpack still apply. When healing yourself, that Mind cost is deducted after
+the healing, so the net Mind recovery is lower than the healing amount. This
+restores damage within the pool's existing wound-adjusted maximum.
+
+Existing items read their healed attributes from the loaded templates, so these
+changes apply after a server restart without recreating stimpacks. Deploy the Lua
+definitions and rebuild Core3 for the area-target check.
 
 ## Travel
 
@@ -81,3 +97,8 @@ On Windows, use a Visual Studio developer prompt and add `--compiler cl`.
 These checks passed, including 1,744 one-way/round-trip menu selections. They do
 not replace a full server build or live-client test; this checkout has no populated
 `MMOCoreORB/utils/engine3` dependency, so those require the normal build environment.
+
+Run `python MMOCoreORB/utils/tests/stimpack_healing_test.py` with the same
+dependencies to check all 27 stimpack and repair-kit definitions and compile the
+production area-target and healing methods. It covers Mind-only patients, all
+three pools, and the existing line-of-sight, entry and dead-target restrictions.
