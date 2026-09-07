@@ -8,6 +8,14 @@ int main() {
 	static_assert(CreditScale::credits(1000) == 10, "training price");
 	static_assert(CreditScale::credits(15000) == 150, "mission reward");
 	static_assert(CreditScale::credits(INT_MAX) == 21474837, "no addition overflow");
+	// Lua::getGlobalInt returns uint32, so exercise the actual argument type.
+	static_assert(CreditScale::credits(std::uint32_t{1000}) == 10, "unsigned Lua starting credits");
+	static_assert(CreditScale::credits(std::uint32_t{101}) == 2, "unsigned rounding up");
+	static_assert(CreditScale::credits(UINT32_MAX) == 42949673, "scale before converting to signed credits");
+	assert(CreditScale::credits(std::uint32_t{0}) == 0);
+	assert(CreditScale::credits(std::uint32_t{1}) == 1);
+	assert(CreditScale::credits(std::uint32_t{99}) == 1);
+	assert(CreditScale::credits(std::uint32_t{100}) == 1);
 	assert(CreditScale::credits(0) == 0);
 	assert(CreditScale::credits(-1) == -1);
 	assert(CreditScale::credits(1) == 1);
@@ -18,6 +26,7 @@ int main() {
 	assert(CreditScale::credits(530) == 6);
 	assert(CreditScale::credits(15001) == 151);
 	assert(CreditScale::credits(100.01) == 2);
+	assert(CreditScale::credits(100.01f) == 2); // Floating upkeep still selects the floating overload.
 	assert(CreditScale::credits(0.01) == 1);
 	assert(CreditScale::credits(0.0) == 0);
 	assert(CreditScale::credits(15001.0 + 99.0) == 151);
