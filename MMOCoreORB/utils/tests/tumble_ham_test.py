@@ -1,4 +1,4 @@
-"""Compile all three production tumble commands and check their full HAM cost.
+"""Compile all three tumble commands and check HAM draining without incapacitation.
 
 Requires Python and a C++17 compiler. This does not replace a full Core3 build.
 """
@@ -101,7 +101,7 @@ struct QueueCommand {
         cpp += "\n".join(line for line in (commands / name).read_text().splitlines()
                          if not line.startswith("#include")) + "\n"
     cpp += r'''
-template<class Command> void checkCommand() {
+template<class Command> void checkCommand(int expectedPosture) {
     ZoneProcessServer server;
     Command command("tumble", &server);
     for (int secondary : {300, 2500}) {
@@ -111,18 +111,20 @@ template<class Command> void checkCommand() {
                 creature.ham[0] = pools[0]; creature.ham[3] = pools[1]; creature.ham[6] = pools[2];
                 creature.ham[1] = creature.ham[4] = creature.ham[7] = secondary;
                 creature.dizzy = dizzy;
-                creature.dizzyEvent = true; // Also cancel a fall queued before the tumble.
                 const auto previous = creature.ham;
                 server.zone.target = dizzy ? &target : nullptr;
                 assert(command.doQueueCommand(&creature, 42, "") == QueueCommand::SUCCESS);
-                assert(creature.ham[0] == 0 && creature.ham[3] == 0 && creature.ham[6] == 0);
+                assert(creature.ham[0] == 1 && creature.ham[3] == 1 && creature.ham[6] == 1);
                 for (int index : {1, 2, 4, 5, 7, 8}) assert(creature.ham[index] == previous[index]);
-                assert(creature.destructionEvents == 1 && creature.updates == 3);
-                assert(creature.posture == CreaturePosture::INCAPACITATED && !creature.dizzyEvent);
+                assert(creature.destructionEvents == 0 && creature.updates == 3);
+                assert(creature.posture == expectedPosture && creature.dizzyEvent == dizzy);
+                assert(creature.buffs == (dizzy ? 0 : 1));
                 assert(creature.animations == 1 && creature.animation == (dizzy ? 2 : 1));
                 assert(creature.animationTarget == (dizzy ? &target : &creature));
-                assert(command.doQueueCommand(&creature, 42, "") == QueueCommand::INSUFFICIENTHAM);
-                assert(creature.destructionEvents == 1 && creature.animations == 1);
+                assert(command.doQueueCommand(&creature, 42, "") == QueueCommand::SUCCESS);
+                assert(creature.ham[0] == 1 && creature.ham[3] == 1 && creature.ham[6] == 1);
+                assert(creature.destructionEvents == 0 && creature.animations == 2);
+                assert(creature.posture == expectedPosture);
             }
         }
     }
@@ -144,10 +146,10 @@ template<class Command> void checkCommand() {
     }
 }
 int main() {
-    checkCommand<TumbleToKneelingCommand>();
-    checkCommand<TumbleToProneCommand>();
-    checkCommand<TumbleToStandingCommand>();
-    std::cout << "All three tumble commands: full HAM drain, single incapacitation notification, dizzy cancellation and failed-command checks passed.\n";
+    checkCommand<TumbleToKneelingCommand>(CreaturePosture::CROUCHED);
+    checkCommand<TumbleToProneCommand>(CreaturePosture::PRONE);
+    checkCommand<TumbleToStandingCommand>(CreaturePosture::UPRIGHT);
+    std::cout << "All three tumble commands: 1-point HAM minimum, no incapacitation, repeated tumbles, posture, dizzy behavior and failed-command checks passed.\n";
 }
 '''
     with tempfile.TemporaryDirectory(prefix="solo_tumble_") as tmp:

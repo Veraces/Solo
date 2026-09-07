@@ -23,7 +23,7 @@ public:
 		if (!checkInvalidLocomotions(creature))
 			return INVALIDLOCOMOTION;
 
-		// A successful tumble consumes all remaining primary HAM pools.
+		// A successful tumble drains primary HAM while leaving one point in each pool.
 		if (creature->getHAM(CreatureAttribute::HEALTH) <= 0
 				|| creature->getHAM(CreatureAttribute::ACTION) <= 0
 				|| creature->getHAM(CreatureAttribute::MIND) <= 0)
@@ -54,13 +54,10 @@ public:
 			creature->sendStateCombatSpam("cbt_spam", "tum_kneel", 0);
 		}
 
-		// Finish the tumble before incapacitating. Damage calls would stop
-		// after the first empty pool, so update all three and notify once.
-		creature->clearDizzyEvent();
-		creature->setHAM(CreatureAttribute::HEALTH, 0, true);
-		creature->setHAM(CreatureAttribute::ACTION, 0, true);
-		creature->setHAM(CreatureAttribute::MIND, 0, true);
-		creature->notifyObjectDestructionObservers(creature, 0, false);
+		// Keep the character conscious after paying the HAM cost.
+		creature->setHAM(CreatureAttribute::HEALTH, 1, true);
+		creature->setHAM(CreatureAttribute::ACTION, 1, true);
+		creature->setHAM(CreatureAttribute::MIND, 1, true);
 
 		return SUCCESS;
 	}
