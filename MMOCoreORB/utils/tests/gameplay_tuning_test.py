@@ -125,9 +125,15 @@ using SkillList = Vector<Reference<Skill*>>;
 struct Locker { explicit Locker(void*) {} };
 namespace CreaturePosture { enum { UPRIGHT, PRONE }; }
 namespace CreatureState { enum { COVER }; }
+struct SharedObjectTemplate {
+    bool player = true;
+    bool isPlayerCreatureTemplate() const { return player; }
+};
 class CreatureObjectImplementation : public SceneObject {
 public:
-    bool player = true, cover = false, rifleSkill = false;
+    bool cover = false, rifleSkill = false;
+    SharedObjectTemplate creatureTemplate;
+    Reference<SharedObjectTemplate*> templateObject{&creatureTemplate};
     int posture = CreaturePosture::UPRIGHT;
     std::map<String, int> mods;
     ZoneServer* server = nullptr;
@@ -144,7 +150,8 @@ public:
     std::ostream& info() { return std::cout; }
     float getSpeedModifier() const;
     float getAccelerationModifier() const;
-    bool isPlayerCreature() const { return player; }
+    // Match the non-const IDL declaration to catch calls from const methods.
+    bool isPlayerCreature();
     int getSkillMod(const String& name) const { auto it = mods.find(name); return it == mods.end() ? 0 : it->second; }
     bool hasState(int) const { return cover; }
     bool hasSkill(const String&) const { return rifleSkill; }
@@ -262,6 +269,7 @@ public:
         ("src/server/zone/managers/skill/SkillModManager.cpp", "void SkillModManager::verifySkillBoxSkillMods("),
         ("src/server/zone/objects/creature/CreatureObjectImplementation.cpp", "float CreatureObjectImplementation::getSpeedModifier() const"),
         ("src/server/zone/objects/creature/CreatureObjectImplementation.cpp", "float CreatureObjectImplementation::getAccelerationModifier() const"),
+        ("src/server/zone/objects/creature/CreatureObjectImplementation.cpp", "bool CreatureObjectImplementation::isPlayerCreature()"),
         ("src/server/zone/managers/planet/PlanetManagerImplementation.cpp", "int PlanetManagerImplementation::getTravelFare("),
         ("src/server/zone/managers/planet/PlanetManagerImplementation.cpp", "bool PlanetManagerImplementation::isTravelToLocationPermitted("),
     ]:
@@ -299,9 +307,18 @@ int main() {
     int modUpdates = player.modUpdates;
     skillMods.verifySkillBoxSkillMods(&player);
     assert(player.modUpdates == modUpdates);
-    npc.player = false;
+    npc.creatureTemplate.player = false;
+    assert(player.isPlayerCreature() && !npc.isPlayerCreature());
     assert(player.getSpeedModifier() == 2.f && npc.getSpeedModifier() == 1.f);
     assert(player.getAccelerationModifier() == 2.f && npc.getAccelerationModifier() == 1.f);
+    CreatureObject uninitialized;
+    uninitialized.templateObject = nullptr;
+    assert(!uninitialized.isPlayerCreature());
+    assert(uninitialized.getSpeedModifier() == 1.f);
+    assert(uninitialized.getAccelerationModifier() == 1.f);
+    const CreatureObject& constPlayer = player;
+    assert(constPlayer.getSpeedModifier() == 2.f);
+    assert(constPlayer.getAccelerationModifier() == 2.f);
     player.mods["private_speed_multiplier"] = 150;
     assert(player.getSpeedModifier() == 3.f);
     player.mods.clear();

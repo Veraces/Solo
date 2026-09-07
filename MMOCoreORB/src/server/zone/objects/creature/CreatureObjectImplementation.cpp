@@ -1683,7 +1683,9 @@ float CreatureObjectImplementation::getSpeedModifier() const {
 		}
 	}
 
-	return isPlayerCreature() ? modifier * MovementScale::PLAYER_MULTIPLIER : modifier;
+	// isPlayerCreature() is not const; use its template check directly.
+	const auto* objectTemplate = templateObject.get();
+	return objectTemplate != nullptr && objectTemplate->isPlayerCreatureTemplate() ? modifier * MovementScale::PLAYER_MULTIPLIER : modifier;
 }
 
 float CreatureObjectImplementation::getAccelerationModifier() const {
@@ -1695,7 +1697,8 @@ float CreatureObjectImplementation::getAccelerationModifier() const {
 		}
 	}
 
-	return isPlayerCreature() ? modifier * MovementScale::PLAYER_MULTIPLIER : modifier;
+	const auto* objectTemplate = templateObject.get();
+	return objectTemplate != nullptr && objectTemplate->isPlayerCreatureTemplate() ? modifier * MovementScale::PLAYER_MULTIPLIER : modifier;
 }
 
 void CreatureObjectImplementation::sendSpeedAndAccelerationMods(SceneObject* player) {
