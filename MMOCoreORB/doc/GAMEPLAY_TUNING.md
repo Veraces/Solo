@@ -34,11 +34,17 @@ same multiplier, and player movement is refreshed at login.
 
 ## Travel
 
-Using a starport terminal opens a server-generated destination list. It includes
-all operating starports on every enabled planet, plus the existing eligible
-local shuttle destinations. After selecting a destination, choose a one-way or
-round-trip ticket and board normally. This avoids the stock client's planet-route
-filter without requiring a patched client to use the new routes.
+Using a travel terminal normally opens the original galaxy/planet travel map.
+Starport terminals also offer an **All destinations** option in their right-click
+radial menu. That optional list includes all operating starports on every enabled
+planet, plus the existing eligible local shuttle destinations. After selecting a
+destination, choose a one-way or round-trip ticket and board normally. Use this
+option for direct routes that the stock client's map does not expose.
+
+The server permits direct travel between starports, but the original map still
+uses the client's travel data. Showing every direct route and the reduced fares
+on that map requires a matching client asset update; this server change does not
+distribute one. The optional destination list works without a client patch.
 
 Existing fares retain the earlier 100x reduction. Newly opened interplanetary
 routes cost 10 credits one way or 20 for a round trip. New routes use a 1,000-credit
@@ -59,10 +65,11 @@ their skill and movement updates when they log in. No balance or character-data
 migration is needed.
 
 `utils/tests/gameplay_tuning_test.py` compiles the production modifier, skill
-reconciliation, fare and route methods and the travel SUI callback against
-in-memory game objects. It loads the actual ten-planet Lua configuration and
+reconciliation, fare and route methods, travel terminal handlers and the travel
+SUI callback against in-memory game objects. It loads the actual ten-planet Lua configuration and
 checks bonuses, repeat-login behavior, movement modifiers, route eligibility,
-ticket selection, cancellation, invalid selections, distance checks and pricing.
+the default map-opening packet, the optional starport radial entry, ticket
+selection, cancellation, invalid selections, distance checks and pricing.
 
 Run from the repository root with Python, `lupa`, and a C++17 compiler:
 

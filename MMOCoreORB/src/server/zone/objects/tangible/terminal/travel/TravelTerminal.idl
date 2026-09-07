@@ -12,6 +12,7 @@ import server.zone.objects.tangible.terminal.Terminal;
 import server.zone.objects.creature.CreatureObject;
 import server.zone.Zone;
 import server.zone.managers.planet.PlanetManager;
+import server.zone.packets.object.ObjectMenuResponse;
 include server.zone.managers.planet.PlanetTravelPoint;
 
 @json
@@ -32,6 +33,10 @@ class TravelTerminal extends Terminal {
 	}
 
 	public native void notifyInsertToZone(Zone zone);
+
+	@local
+	@dirty
+	public native void fillObjectMenuResponse(ObjectMenuResponse menuResponse, CreatureObject player);
 
 	/**
 	 * Handles the radial selection sent by the client

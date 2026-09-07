@@ -58,8 +58,10 @@ def main():
 #include "server/zone/managers/credit/CreditScale.h"
 #include "server/zone/objects/creature/MovementScale.h"
 #include "server/zone/objects/player/sui/SuiWindowType.h"
+#include "server/zone/managers/radial/RadialOptions.h"
 using uint32 = uint32_t;
 using uint64 = uint64_t;
+using byte = unsigned char;
 struct String : std::string {
     using std::string::string;
     String(const std::string& text) : std::string(text) {}
@@ -100,6 +102,14 @@ template<class K, class V> struct VectorMap : std::map<K, V> {
     void put(const K& key, const V& value) { (*this)[key] = value; }
 };
 template<class T, class U> T cast(U* value) { return dynamic_cast<T>(value); }
+struct BaseMessage {
+    Vector<String> strings;
+    Vector<uint32> numbers;
+    void insertShort(uint32 value) { numbers.add(value); }
+    void insertInt(uint32 value) { numbers.add(value); }
+    void insertByte(byte value) { numbers.add(value); }
+    void insertAscii(const String& value) { strings.add(value); }
+};
 uint32 STRING_HASHCODE(const char*) { return 1; }
 class Zone;
 class PlanetManagerImplementation;
@@ -141,6 +151,7 @@ public:
     PlayerObject ghost;
     Reference<CityRegion*> city;
     Vector<String> purchases;
+    Vector<void*> messages;
     SkillList skills;
     std::map<String, int> skillBoxMods;
     int modUpdates = 0;
@@ -160,7 +171,7 @@ public:
     Zone* getZone() { return zone; }
     Reference<CityRegion*> getCityRegion() { return city; }
     uint64 getObjectID() const { return 42; }
-    void sendMessage(void*) {}
+    void sendMessage(void* message) { messages.add(message); }
     void executeObjectControllerAction(uint32, uint64, const String& arguments) { purchases.add(arguments); }
 };
 struct Skill {
@@ -223,15 +234,32 @@ public:
     bool isIncomingTravelAllowed(const String& name) { auto p = getPlanetTravelPoint(name); return p && p->incoming; }
     bool isInterplanetaryTravelAllowed(const String& name) { auto p = getPlanetTravelPoint(name); return p && p->interplanetary; }
 };
-struct TravelTerminal : SceneObject {
-    Zone* zone;
-    PlanetTravelPoint* point;
+struct ObjectMenuResponse {
+    std::map<int, String> labels;
+    void addRadialMenuItem(byte id, byte, const String& label) { labels[id] = label; }
+};
+struct TerminalImplementation : SceneObject {
+    int baseMenuCalls = 0;
+    void fillObjectMenuResponse(ObjectMenuResponse*, CreatureObject*) { ++baseMenuCalls; }
+};
+struct TravelTerminalImplementation : TerminalImplementation {
+    struct SelfReference {
+        TravelTerminalImplementation* ptr;
+        TravelTerminalImplementation* getReferenceUnsafeStaticCast() { return ptr; }
+    } _this{this};
+    Zone* zone = nullptr;
+    PlanetTravelPoint* point = nullptr;
     bool near = true;
+    int errors = 0;
+    void error(const String&) { ++errors; }
+    int handleObjectMenuSelect(CreatureObject*, byte);
+    void fillObjectMenuResponse(ObjectMenuResponse*, CreatureObject*);
     Zone* getZone() { return zone; }
     PlanetTravelPoint* getPlanetTravelPoint() { return point; }
     bool isInRange(CreatureObject*, float) const { return near; }
     uint64 getObjectID() const { return 100; }
 };
+using TravelTerminal = TravelTerminalImplementation;
 struct SuiCallback {
     ZoneServer* server;
     explicit SuiCallback(ZoneServer* value) : server(value) {}
@@ -280,6 +308,12 @@ public:
     cpp += can_travel + "\n"
     callback = (CORE / "src/server/zone/objects/player/sui/callbacks/StarportTravelSuiCallback.h").read_text()
     cpp += "\n".join(line for line in callback.splitlines() if not line.startswith("#"))
+    packet = (CORE / "src/server/zone/packets/player/EnterTicketPurchaseModeMessage.h").read_text()
+    cpp += "\n".join(line for line in packet.splitlines() if not line.startswith("#"))
+    cpp += method("src/server/zone/objects/tangible/terminal/travel/TravelTerminalImplementation.cpp",
+                  "int TravelTerminalImplementation::handleObjectMenuSelect(")
+    cpp += method("src/server/zone/objects/tangible/terminal/travel/TravelTerminalImplementation.cpp",
+                  "void TravelTerminalImplementation::fillObjectMenuResponse(")
     cpp += r'''
 int main() {
     SkillManager skills;
@@ -357,10 +391,31 @@ manager.zone = &zone; manager.server = &process; server.zones.add(&zone);
         auto& manager = originPair.second;
         player.zone = manager.zone;
         for (auto origin : manager.points) {
-            if (!origin->interplanetary || !origin->incoming) continue;
             TravelTerminal terminal;
             terminal.zone = manager.zone; terminal.point = origin;
-            StarportTravelSuiCallback::showDestinations(&player, &terminal, origin);
+            int previousBoxes = player.ghost.boxes.size();
+            int previousMessages = player.messages.size();
+            terminal.handleObjectMenuSelect(&player, RadialOptions::ITEM_USE);
+            assert(player.ghost.boxes.size() == previousBoxes);
+            assert(player.messages.size() == previousMessages + 1);
+            auto map = static_cast<EnterTicketPurchaseModeMessage*>(player.messages.back());
+            assert(map->numbers.get(1) == 0x904DAE1A);
+            assert(map->strings.get(0) == origin->planet && map->strings.get(1) == origin->name);
+            terminal.handleObjectMenuSelect(&player, 255);
+            assert(player.messages.size() == previousMessages + 1);
+            ObjectMenuResponse radial;
+            terminal.fillObjectMenuResponse(&radial, &player);
+            assert(terminal.baseMenuCalls == 1);
+            assert(radial.labels.count(RadialOptions::SERVER_MENU1) == (origin->interplanetary ? 1u : 0u));
+            if (!origin->interplanetary) {
+                terminal.handleObjectMenuSelect(&player, RadialOptions::SERVER_MENU1);
+                assert(player.ghost.boxes.size() == previousBoxes);
+                assert(player.messages.size() == previousMessages + 1);
+            }
+            if (!origin->interplanetary || !origin->incoming) continue;
+            assert(radial.labels.at(RadialOptions::SERVER_MENU1) == "All destinations");
+            terminal.handleObjectMenuSelect(&player, RadialOptions::SERVER_MENU1);
+            assert(player.ghost.boxes.size() == previousBoxes + 1);
             auto destinations = dynamic_cast<SuiListBox*>(player.ghost.boxes.back());
             int expected = 0;
             for (auto& destinationPair : managers) {
@@ -397,16 +452,28 @@ manager.zone = &zone; manager.server = &process; server.zones.add(&zone);
             bad.get(0) = "0";
             terminal.near = false;
             destinations->callback->run(&player, destinations, 0, &bad);
+            terminal.handleObjectMenuSelect(&player, RadialOptions::SERVER_MENU1);
             assert(player.ghost.boxes.size() == boxes);
         }
     }
+    TravelTerminal missingPoint;
+    ObjectMenuResponse missingRadial;
+    int previousMessages = player.messages.size();
+    int previousBoxes = player.ghost.boxes.size();
+    missingPoint.fillObjectMenuResponse(&missingRadial, &player);
+    assert(missingRadial.labels.empty());
+    missingPoint.handleObjectMenuSelect(&player, RadialOptions::ITEM_USE);
+    missingPoint.handleObjectMenuSelect(&player, RadialOptions::SERVER_MENU1);
+    assert(missingPoint.errors == 2);
+    assert(player.messages.size() == previousMessages);
+    assert(player.ghost.boxes.size() == previousBoxes);
     auto& fares = managers["corellia"];
     fares.travelFares.get("corellia").put("naboo", 500);
     assert(fares.getTravelFare("corellia", "naboo") == 500);
     assert(CreditScale::credits(fares.getTravelFare("corellia", "naboo")) == 5);
     assert(CreditScale::credits(fares.getTravelFare("corellia", "rori")) == 10);
     assert(fares.getTravelFare("corellia", "disabled_planet") == 0);
-    std::cout << "Master bonuses, movement and " << routes << " one-way/round-trip menu selections passed.\n";
+    std::cout << "Master bonuses, movement, default travel maps, optional destination menus and " << routes << " one-way/round-trip menu selections passed.\n";
 }
 '''
     with tempfile.TemporaryDirectory(prefix="solo_gameplay_") as tmp:

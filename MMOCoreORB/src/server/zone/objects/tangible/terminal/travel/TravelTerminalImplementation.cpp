@@ -10,9 +10,18 @@
 #include "server/zone/packets/player/EnterTicketPurchaseModeMessage.h"
 #include "server/zone/objects/creature/CreatureObject.h"
 #include "server/zone/objects/player/sui/callbacks/StarportTravelSuiCallback.h"
+#include "server/zone/packets/object/ObjectMenuResponse.h"
+
+void TravelTerminalImplementation::fillObjectMenuResponse(ObjectMenuResponse* menuResponse, CreatureObject* player) {
+	TerminalImplementation::fillObjectMenuResponse(menuResponse, player);
+
+	Reference<PlanetTravelPoint*> ptp = getPlanetTravelPoint();
+	if (ptp != nullptr && ptp->isInterplanetary())
+		menuResponse->addRadialMenuItem(RadialOptions::SERVER_MENU1, 3, "All destinations");
+}
 
 int TravelTerminalImplementation::handleObjectMenuSelect(CreatureObject* player, byte selectedID) {
-	if (selectedID != 20)
+	if (selectedID != RadialOptions::ITEM_USE && selectedID != RadialOptions::SERVER_MENU1)
 		return 0;
 
 	Reference<PlanetTravelPoint*> ptp = getPlanetTravelPoint();
@@ -23,10 +32,10 @@ int TravelTerminalImplementation::handleObjectMenuSelect(CreatureObject* player,
 		return 0;
 	}
 
-	// The stock planet map filters routes using the client's travel.iff.
-	// Use server destinations at starports so every direct route is selectable.
-	if (ptp->isInterplanetary()) {
-		StarportTravelSuiCallback::showDestinations(player, _this.getReferenceUnsafeStaticCast(), ptp);
+	// Keep the complete route list as an explicit alternative to the galaxy map.
+	if (selectedID == RadialOptions::SERVER_MENU1) {
+		if (ptp->isInterplanetary())
+			StarportTravelSuiCallback::showDestinations(player, _this.getReferenceUnsafeStaticCast(), ptp);
 		return 0;
 	}
 
